@@ -16,22 +16,15 @@ import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public interface Launcher {
     void download(LauncherConfig config);
 
     void launch(LauncherConfig config);
 
-    default List<String> getLaunchProperties(LauncherConfig config) {
-        RuntimeMXBean bean = ManagementFactory.getRuntimeMXBean();
-        List<String> jvmArgs = bean.getInputArguments();
-        List<String> list = new ArrayList<>(jvmArgs);
-        list.addAll(config.getExtraLaunchProperties());
-        return list;
-    }
-
     default List<String> getLaunchArgs(LauncherConfig config) {
-        List<String> list = new ArrayList<>(Arrays.asList(ServerLauncher.getArgs()));
+        List<String> list = new ArrayList<>(ServerLauncher.getArgs());
         list.addAll(config.getExtraLaunchArgs());
         return list;
     }

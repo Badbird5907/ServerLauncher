@@ -10,14 +10,25 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class ServerLauncher {
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     @Getter
-    private static String[] args;
+    private static List<String> args;
 
+    private static boolean downloadOnly = false;
     public static void main(String[] args) throws IOException {
-        ServerLauncher.args = args;
+        List<String> a = new ArrayList<>(Arrays.asList(args));
+        for (String s : a) {
+            if (s.equalsIgnoreCase("--download-only")) {
+                downloadOnly = true;
+                a.remove(s);
+            }
+        }
+        ServerLauncher.args = a;
         LauncherConfig config;
         File configFile = new File("launcher_config.json");
         if (!configFile.exists()) {
@@ -26,6 +37,7 @@ public class ServerLauncher {
                 PrintStream ps = new PrintStream(configFile);
                 ps.print(GSON.toJson(new LauncherConfig()));
                 ps.close();
+                System.out.println("Created launcher_config.json, edit it (if needed) and start again.");
                 return;
             } catch (IOException e) {
                 e.printStackTrace();
@@ -36,5 +48,9 @@ public class ServerLauncher {
         Launcher launcher = config.getDistro().getLauncher();
         System.out.println("Downloading latest jar");
         launcher.download(config);
+        if (!downloadOnly) {
+            System.out.println("Launching server");
+            launcher.launch(config);
+        }
     }
 }
