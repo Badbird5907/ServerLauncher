@@ -17,8 +17,12 @@ import java.net.URLClassLoader;
 import java.net.URLConnection;
 import java.util.List;
 import java.util.jar.JarFile;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 public class PaperLauncher implements Launcher {
+    private static final Logger LOGGER = Logger.getLogger("PaperLauncher");
+
     private static String jarName = "";
 
     @SneakyThrows
@@ -61,7 +65,7 @@ public class PaperLauncher implements Launcher {
             int i = build.getAsInt();
             if (i > largest) largest = i;
         }
-        System.out.println("Found latest build for PaperMC " + cfg.getVersion() + " #" + largest);
+        LOGGER.info("Found latest build for PaperMC " + cfg.getVersion() + " #" + largest);
         return largest;
     }
 
@@ -69,12 +73,12 @@ public class PaperLauncher implements Launcher {
     @Override
     public void launch(LauncherConfig config) {
         if (jarName.isEmpty()) {
-            System.out.println("jarName not set, cannot launch");
+            LOGGER.info("jarName not set, cannot launch");
             return;
         }
         File jarFile = new File(jarName);
         if (!jarFile.exists()) {
-            System.out.println("jarFile not found, cannot launch");
+            LOGGER.info("jarFile not found, cannot launch");
             return;
         }
         config.getExtraLaunchProperties().forEach(System::setProperty);

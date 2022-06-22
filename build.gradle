@@ -32,7 +32,7 @@ jar {
     }
 }
 shadowJar {
-    archiveFileName = 'ServerLauncher-${project.version}.jar'
+    archiveFileName = 'ServerLauncher.jar'
 
     relocate 'com.google.gson', 'dev.badbird.serverlauncher.shadow.gson'
 }

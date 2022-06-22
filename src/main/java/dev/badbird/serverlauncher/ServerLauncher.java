@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class ServerLauncher {
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
@@ -20,6 +21,8 @@ public class ServerLauncher {
     private static List<String> args;
 
     private static boolean downloadOnly = false;
+
+    private static final Logger LOGGER = Logger.getLogger("Launcher");
     public static void main(String[] args) throws IOException {
         List<String> a = new ArrayList<>(Arrays.asList(args));
         for (String s : a) {
@@ -37,7 +40,7 @@ public class ServerLauncher {
                 PrintStream ps = new PrintStream(configFile);
                 ps.print(GSON.toJson(new LauncherConfig()));
                 ps.close();
-                System.out.println("Created launcher_config.json, edit it (if needed) and start again.");
+                LOGGER.info("Created launcher_config.json, edit it (if needed) and start again.");
                 return;
             } catch (IOException e) {
                 e.printStackTrace();
@@ -46,10 +49,10 @@ public class ServerLauncher {
         }
         config = GSON.fromJson(new String(Files.readAllBytes(configFile.toPath())), LauncherConfig.class);
         Launcher launcher = config.getDistro().getLauncher();
-        System.out.println("Downloading latest jar");
+        LOGGER.info("Downloading latest jar");
         launcher.download(config);
         if (!downloadOnly) {
-            System.out.println("Launching server");
+            LOGGER.info("Launching server");
             launcher.launch(config);
         }
     }
