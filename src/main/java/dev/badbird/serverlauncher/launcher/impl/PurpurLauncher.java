@@ -1,27 +1,19 @@
 package dev.badbird.serverlauncher.launcher.impl;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import dev.badbird.serverlauncher.config.LauncherConfig;
 import dev.badbird.serverlauncher.launcher.Launcher;
 import lombok.SneakyThrows;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.net.URLConnection;
 import java.util.List;
 import java.util.jar.JarFile;
-import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-public class PaperLauncher implements Launcher {
-    private static final Logger LOGGER = Logger.getLogger("PaperLauncher");
+public class PurpurLauncher implements Launcher {
+    private static final Logger LOGGER = Logger.getLogger("PurpurLauncher");
 
     private static String jarName = "";
 
@@ -31,13 +23,21 @@ public class PaperLauncher implements Launcher {
         String buildVersion = config.getBuildNumber();
         int buildNumber;
         if (buildVersion.equals("AUTO")) {
-            buildNumber = getLatestBuildNumber(config);
+            buildNumber = -1;
         } else buildNumber = Integer.parseInt(buildVersion);
-        String downloadURL = "https://api.papermc.io/v2/projects/paper/versions/%version%/builds/%build%/downloads/paper-%version%-%build%.jar"
+        /*
+        String downloadURL = "https://api.purpurmc.org/v2/projects/purpur/versions/%version%/builds/%build%/downloads/paper-%version%-%build%.jar"
                 .replace("%version%", config.getVersion())
                 .replace("%build%", buildNumber + "");
+         */
+        String downloadURL;
+        if (buildNumber == -1) {
+            downloadURL = "https://api.purpurmc.org/v2/purpur/" + config.getVersion() + "/latest/download/";
+        } else {
+            downloadURL = "https://api.purpurmc.org/v2/purpur/" + config.getVersion() + "/" + buildNumber + "/download/";
+        }
         String downloadTarget = config.getDownloadedFileName()
-                .replace("%server%", "paper")
+                .replace("%server%", "purpur")
                 .replace("%version%", config.getVersion())
                 .replace("%build%", buildNumber + "");
         System.out.println("Downloading server jar build #" + buildNumber + " version " + config.getVersion());
@@ -46,28 +46,6 @@ public class PaperLauncher implements Launcher {
         File file = new File(downloadTarget);
         downloadFile(new URL(downloadURL), file);
     }
-
-    public int getLatestBuildNumber(LauncherConfig cfg) throws Exception {
-        String urlString = "https://api.papermc.io/v2/projects/paper/versions/" + cfg.getVersion();
-        URL url = new URL(urlString);
-        URLConnection connection = url.openConnection();
-        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        StringBuilder sb = new StringBuilder();
-        String inputLine;
-
-        while ((inputLine = in.readLine()) != null)
-            sb.append(inputLine).append("\n");
-        in.close();
-        JsonObject json = JsonParser.parseString(sb.toString()).getAsJsonObject();
-        int largest = 0;
-        for (JsonElement build : json.get("builds").getAsJsonArray()) {
-            int i = build.getAsInt();
-            if (i > largest) largest = i;
-        }
-        LOGGER.info("Found latest build for PaperMC " + cfg.getVersion() + " #" + largest);
-        return largest;
-    }
-
     @SneakyThrows
     @Override
     public void launch(LauncherConfig config) {
