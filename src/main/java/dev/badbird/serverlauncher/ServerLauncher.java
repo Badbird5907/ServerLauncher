@@ -22,7 +22,6 @@ public class ServerLauncher {
 
     private static boolean downloadOnly = false;
 
-    private static final Logger LOGGER = Logger.getLogger("Launcher");
     public static void main(String[] args) throws IOException {
         List<String> a = new ArrayList<>(Arrays.asList(args));
         for (String s : a) {
@@ -40,7 +39,7 @@ public class ServerLauncher {
                 PrintStream ps = new PrintStream(configFile);
                 ps.print(GSON.toJson(new LauncherConfig()));
                 ps.close();
-                LOGGER.info("Created launcher_config.json, edit it (if needed) and start again.");
+                System.out.println("[Launcher] Created launcher_config.json, edit it (if needed) and start again.");
                 return;
             } catch (IOException e) {
                 e.printStackTrace();
@@ -49,10 +48,10 @@ public class ServerLauncher {
         }
         config = GSON.fromJson(new String(Files.readAllBytes(configFile.toPath())), LauncherConfig.class);
         Launcher launcher = config.getDistro().getLauncher();
-        LOGGER.info("Downloading latest jar");
+        System.out.println("[Launcher] Downloading latest jar");
         launcher.download(config);
         if (!downloadOnly) {
-            LOGGER.info("Launching server");
+            System.out.println("[Launcher] Launching server");
             launcher.launch(config);
         }
     }

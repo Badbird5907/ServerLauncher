@@ -40,8 +40,8 @@ public class PaperLauncher implements Launcher {
                 .replace("%server%", "paper")
                 .replace("%version%", config.getVersion())
                 .replace("%build%", buildNumber + "");
-        System.out.println("Downloading server jar build #" + buildNumber + " version " + config.getVersion());
-        System.out.println("Downloading to " + downloadTarget + " from " + downloadURL);
+        System.out.println("[PaperLauncher] Downloading server jar build #" + buildNumber + " version " + config.getVersion());
+        System.out.println("[PaperLauncher] Downloading to " + downloadTarget + " from " + downloadURL);
         jarName = downloadTarget;
         File file = new File(downloadTarget);
         downloadFile(new URL(downloadURL), file);
@@ -64,7 +64,7 @@ public class PaperLauncher implements Launcher {
             int i = build.getAsInt();
             if (i > largest) largest = i;
         }
-        LOGGER.info("Found latest build for PaperMC " + cfg.getVersion() + " #" + largest);
+        System.out.println("[PaperLauncher] Found latest build for PaperMC " + cfg.getVersion() + " #" + largest);
         return largest;
     }
 
@@ -72,12 +72,12 @@ public class PaperLauncher implements Launcher {
     @Override
     public void launch(LauncherConfig config) {
         if (jarName.isEmpty()) {
-            LOGGER.info("jarName not set, cannot launch");
+            System.out.println("[PaperLauncher] jarName not set, cannot launch");
             return;
         }
         File jarFile = new File(jarName);
         if (!jarFile.exists()) {
-            LOGGER.info("jarFile not found, cannot launch");
+            System.out.println("[PaperLauncher] jarFile not found, cannot launch");
             return;
         }
         config.getExtraLaunchProperties().forEach(System::setProperty);
@@ -85,7 +85,7 @@ public class PaperLauncher implements Launcher {
         JarFile jar = new JarFile(jarFile);
         String mainClass;
         if (jar.getManifest() == null) {
-            System.err.println("No manifest found in jar, attempting to launch with pre-set main class");
+            System.err.println("[PaperLauncher] No manifest found in jar, attempting to launch with pre-set main class");
             mainClass = "io.papermc.paperclip.Main";
         } else {
             mainClass = jar.getManifest().getMainAttributes().getValue("Main-Class");
@@ -95,7 +95,7 @@ public class PaperLauncher implements Launcher {
         try {
             mainClazz = Class.forName(mainClass, true, classLoader);
         } catch (ClassNotFoundException e) {
-            System.err.println("Main class not found in jar, cannot launch.");
+            System.err.println("[PaperLauncher] Main class not found in jar, cannot launch.");
             return;
         }
         Method mainMethod = mainClazz.getMethod("main", String[].class);
