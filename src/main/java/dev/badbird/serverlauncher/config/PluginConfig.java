@@ -44,7 +44,6 @@ public class PluginConfig {
                 }
                 if (artifact != null) {
                     InputStream is = build.details().downloadArtifact(artifact);
-                    if (file.exists()) file.delete();
                     //download the file
                     downloadFile(file, is);
                 }
@@ -55,6 +54,7 @@ public class PluginConfig {
     }
 
     public void downloadFile(File file, InputStream is) throws IOException {
+        if (file.exists()) file.delete();
         FileOutputStream fos = new FileOutputStream(file);
         byte[] buffer = new byte[1024];
         int len;
