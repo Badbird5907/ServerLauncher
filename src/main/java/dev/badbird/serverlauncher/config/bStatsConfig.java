@@ -24,7 +24,7 @@ public class bStatsConfig {
     }
 
     public static File getFile() {
-        return new File("serverlauncher_bstats.json");
+        return new File(ServerLauncher.SERVER_LAUNCHER_FOLDER, "serverlauncher_bstats.json");
     }
 
     public void save() {

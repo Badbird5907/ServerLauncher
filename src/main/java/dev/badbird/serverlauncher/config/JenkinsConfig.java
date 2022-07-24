@@ -16,11 +16,14 @@ public class JenkinsConfig {
     private String jobName;
     private String artifactName;
 
+    private transient JenkinsServer server;
+
     public JenkinsServer getServer() {
+        if (server != null) return server;
         try {
             if (username != null && apiToken != null)
-                return new JenkinsServer(new URI(serverURL), username, apiToken);
-            else return new JenkinsServer(new URI(serverURL));
+                return server = new JenkinsServer(new URI(serverURL), username, apiToken);
+            else return server = new JenkinsServer(new URI(serverURL));
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }

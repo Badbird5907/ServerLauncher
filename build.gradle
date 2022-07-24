@@ -1,3 +1,4 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
 plugins {
     id 'java'
     id 'com.github.johnrengelman.shadow' version '7.1.2'
@@ -13,6 +14,7 @@ repositories {
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+
     implementation 'com.google.code.gson:gson:2.9.0'
 
     compileOnly 'org.projectlombok:lombok:1.18.24'
@@ -37,4 +39,26 @@ shadowJar {
     archiveFileName = 'ServerLauncher.jar'
 
     relocate 'com.google.gson', 'dev.badbird.serverlauncher.shadow.gson'
+
+    // Relocate the jenkins dependency to the shadow jar
+    relocate 'com.offbytwo.jenkins', 'dev.badbird.serverlauncher.shadow.jenkins'
+}
+task relocateShadowJar(type: ConfigureShadowRelocation) {
+    target = tasks.shadowJar
+    prefix = "dev.badbird.serverlauncher.shadow"
+
+}
+tasks.shadowJar.dependsOn tasks.relocateShadowJar
+
+task runDev(type: JavaExec) {
+    main = 'dev.badbird.serverlauncher.ServerLauncher'
+    group = "Execution"
+    description = "Run the main class with JavaExecTask"
+    classpath = sourceSets.main.runtimeClasspath
+
+    // Redirect input
+
+
+    // Set the working directory to the run directory
+    workingDir = new File(project.rootDir, 'run') // gradle is weird and wouldn't let me do = file(File, string)
 }

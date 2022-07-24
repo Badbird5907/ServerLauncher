@@ -38,7 +38,7 @@ public class PurpurLauncher implements Launcher {
                 .replace("%server%", "purpur")
                 .replace("%version%", config.getVersion())
                 .replace("%build%", buildNumber + "");
-        System.out.println("[PurpurLauncher] Downloading server jar build #" + buildNumber + " version " + config.getVersion());
+        System.out.println("[PurpurLauncher] Downloading server jar build #" + (buildNumber == -1 ? "LATEST" : buildNumber) + " version " + config.getVersion());
         System.out.println("[PurpurLauncher] Downloading to " + downloadTarget + " from " + downloadURL);
         jarName = downloadTarget;
         File file = new File(downloadTarget);

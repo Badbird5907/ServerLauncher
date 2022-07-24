@@ -3,15 +3,14 @@ package dev.badbird.serverlauncher;
 import com.google.gson.*;
 import dev.badbird.serverlauncher.config.LauncherConfig;
 import dev.badbird.serverlauncher.config.PluginConfig;
-import dev.badbird.serverlauncher.config.bStatsConfig;
 import dev.badbird.serverlauncher.launcher.Launcher;
-import dev.badbird.serverlauncher.stats.Metrics;
 import lombok.Getter;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,6 +18,7 @@ import java.util.List;
 public class ServerLauncher {
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     public static final String VERSION = "1.0.1";
+    public static final File SERVER_LAUNCHER_FOLDER = new File("ServerLauncher");
     @Getter
     private static List<String> args;
     private static boolean downloadOnly = false;
@@ -33,37 +33,35 @@ public class ServerLauncher {
                 a.remove(s);
             }
         }
+        if (!SERVER_LAUNCHER_FOLDER.exists()) SERVER_LAUNCHER_FOLDER.mkdir();
         ServerLauncher.args = a;
-        File configFile = new File("launcher_config.json");
+        File configFile = new File(SERVER_LAUNCHER_FOLDER, "launcher_config.json");
         if (!configFile.exists()) {
-            try {
-                configFile.createNewFile();
-                PrintStream ps = new PrintStream(configFile);
-                ps.print(GSON.toJson(new LauncherConfig()));
-                ps.close();
-                System.out.println("[Launcher] Created launcher_config.json, edit it (if needed) and start again.");
-                return;
-            } catch (IOException e) {
-                e.printStackTrace();
-                return;
+            File oldConfig = new File("launcher_config.json");
+            if (oldConfig.exists()) {
+                Files.move(oldConfig.toPath(), configFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                System.out.println("[Launcher] Moved old launcher_config.json to folder ServerLauncher");
+            } else {
+                try {
+                    configFile.createNewFile();
+                    PrintStream ps = new PrintStream(configFile);
+                    ps.print(GSON.toJson(new LauncherConfig()));
+                    ps.close();
+                    System.out.println("[Launcher] Created ServerLauncher/launcher_config.json, edit it (if needed) and start again.");
+                    return;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return;
+                }
             }
         }
         config = GSON.fromJson(new String(Files.readAllBytes(configFile.toPath())), LauncherConfig.class);
-
-        File bStatsFile = bStatsConfig.getFile();
-        bStatsConfig bStatsConfig = null;
-        if (!bStatsFile.exists()) {
-            bStatsConfig = new bStatsConfig(null);
-        } else
-            bStatsConfig = GSON.fromJson(new String(Files.readAllBytes(bStatsFile.toPath())), dev.badbird.serverlauncher.config.bStatsConfig.class);
-
-        new Metrics(15895, bStatsConfig);
 
         Launcher launcher = config.getDistro().getLauncher();
         System.out.println("[Launcher] Downloading latest jar");
         launcher.download(config);
 
-        File pluginConfigFile = new File("plugin_config.json");
+        File pluginConfigFile = new File(SERVER_LAUNCHER_FOLDER, "plugin_config.json");
         if (pluginConfigFile.exists()) {
             JsonArray jsonArray = JsonParser.parseString(new String(Files.readAllBytes(pluginConfigFile.toPath()))).getAsJsonArray();
             System.out.println("[Launcher] Downloading plugins");
@@ -80,6 +78,7 @@ public class ServerLauncher {
         if (!downloadOnly) {
             System.out.println("[Launcher] Launching server");
             launcher.launch(config);
+            System.out.println("[Launcher] Detected server shutdown, goodnight!");
         }
     }
 }
