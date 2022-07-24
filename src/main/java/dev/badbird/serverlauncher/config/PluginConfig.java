@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
 
 @Getter
 public class PluginConfig {
@@ -63,5 +64,6 @@ public class PluginConfig {
         }
         fos.close();
         is.close();
+        System.out.println("[Plugin Downloader] Successfully downloaded file " + file.getName() + " Size: " + Files.size(file.toPath()) + " bytes");
     }
 }
