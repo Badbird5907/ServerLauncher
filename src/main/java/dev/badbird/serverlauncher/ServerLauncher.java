@@ -1,8 +1,8 @@
 package dev.badbird.serverlauncher;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
 import dev.badbird.serverlauncher.config.LauncherConfig;
+import dev.badbird.serverlauncher.config.PluginConfig;
 import dev.badbird.serverlauncher.config.bStatsConfig;
 import dev.badbird.serverlauncher.launcher.Launcher;
 import dev.badbird.serverlauncher.stats.Metrics;
@@ -62,6 +62,21 @@ public class ServerLauncher {
         Launcher launcher = config.getDistro().getLauncher();
         System.out.println("[Launcher] Downloading latest jar");
         launcher.download(config);
+
+        File pluginConfigFile = new File("plugin_config.json");
+        if (pluginConfigFile.exists()) {
+            JsonArray jsonArray = JsonParser.parseString(new String(Files.readAllBytes(pluginConfigFile.toPath()))).getAsJsonArray();
+            System.out.println("[Launcher] Downloading plugins");
+            for (JsonElement je : jsonArray) {
+                PluginConfig pluginConfig = GSON.fromJson(je, PluginConfig.class);
+                System.out.println("[Launcher] Downloading plugin " + pluginConfig.getFileName());
+                pluginConfig.download();
+            }
+            if (downloadOnly) {
+                return;
+            }
+        }
+
         if (!downloadOnly) {
             System.out.println("[Launcher] Launching server");
             launcher.launch(config);

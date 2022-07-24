@@ -21,6 +21,8 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok:1.18.24'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
 
+    implementation 'com.offbytwo.jenkins:jenkins-client:0.3.8'
+
 }
 
 test {
