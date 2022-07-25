@@ -43,12 +43,6 @@ shadowJar {
     // Relocate the jenkins dependency to the shadow jar
     relocate 'com.offbytwo.jenkins', 'dev.badbird.serverlauncher.shadow.jenkins'
 }
-task relocateShadowJar(type: ConfigureShadowRelocation) {
-    target = tasks.shadowJar
-    prefix = "dev.badbird.serverlauncher.shadow"
-
-}
-tasks.shadowJar.dependsOn tasks.relocateShadowJar
 
 task runDev(type: JavaExec) {
     main = 'dev.badbird.serverlauncher.ServerLauncher'
