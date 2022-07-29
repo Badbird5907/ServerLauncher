@@ -6,7 +6,6 @@ import com.google.gson.JsonParser;
 import dev.badbird.serverlauncher.config.LauncherConfig;
 import dev.badbird.serverlauncher.launcher.Launcher;
 import lombok.SneakyThrows;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import java.io.BufferedReader;
 import java.io.File;
