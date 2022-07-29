@@ -31,7 +31,7 @@
     "fileName": "TeamCity.jar",
     "source": {
       "teamCity": {
-        "url": "https://teamcity.example.com.",
+        "url": "https://teamcity.example.com",
         "username": "username",
         "password": "password",
         "token": "token", // You Can use a token instead of a username and password
