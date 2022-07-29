@@ -7,8 +7,6 @@
 
 .gradle/
 
-launcher_config.json
-
 # IntelliJ
 out/
 

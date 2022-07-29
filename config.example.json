@@ -1,0 +1,12 @@
+{
+  "distro": "PAPER",
+  "buildNumber": "AUTO",
+  "extraLaunchProperties": {
+    "key": "value"
+  },
+  "extraLaunchArgs": [
+    "nogui"
+  ],
+  "version": "1.19",
+  "downloadedFileName": "server.jar"
+}
