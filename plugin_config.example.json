@@ -1,0 +1,48 @@
+[
+  {
+    "fileName": "ProtocolLib_GitHub.jar",
+    "source": {
+      "github": {
+        "repository": "dmulloy2/ProtocolLib",
+        "release": "4.8.0",
+        "asset": "ProtocolLib.jar",
+
+        // Auth is optional
+        "username": "username",
+        "token": "Github Token"
+      }
+    }
+  },
+  {
+    "fileName": "ProtocolLib_Jenkins.jar",
+    "source": {
+      "jenkins": {
+        "serverURL": "https://ci.dmulloy2.net/",
+        "jobName": "ProtocolLib",
+        "artifactName": "ProtocolLib.jar",
+
+        // Auth is optional
+        "username": "username",
+        "token": "Jenkins Token"
+      }
+    }
+  },
+  {
+    "fileName": "TeamCity.jar",
+    "source": {
+      "teamCity": {
+        "url": "https://teamcity.example.com",
+        "username": "username",
+        "password": "password",
+        "token": "token", // You Can use a token instead of a username and password
+        "buildConfig": "Plugin",
+        "artifactName": "Plugin.jar",
+        // Optional fields:
+        "tag": "release",
+        "branch": "production",
+        "number": "69", // Build number
+        "revision": "8a29fb6a70f9ab37e7620dacb08608d744e00c6c", // Commit hash
+      }
+    }
+  }
+]

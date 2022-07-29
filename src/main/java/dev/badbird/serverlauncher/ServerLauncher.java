@@ -4,15 +4,16 @@ import com.google.gson.*;
 import dev.badbird.serverlauncher.config.LauncherConfig;
 import dev.badbird.serverlauncher.config.PluginConfig;
 import dev.badbird.serverlauncher.launcher.Launcher;
+import dev.badbird.serverlauncher.util.Utilities;
 import lombok.Getter;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 public class ServerLauncher {
@@ -27,41 +28,40 @@ public class ServerLauncher {
 
     public static void main(String[] args) throws IOException {
         List<String> a = new ArrayList<>(Arrays.asList(args));
-        for (String s : a) {
-            if (s.equalsIgnoreCase("--download-only")) {
+        Iterator<String> iterator = a.iterator();
+        while (iterator.hasNext()) {
+            String arg = iterator.next();
+            if (arg.equals("--download-only")) {
                 downloadOnly = true;
-                a.remove(s);
+                iterator.remove();
             }
         }
         if (!SERVER_LAUNCHER_FOLDER.exists()) SERVER_LAUNCHER_FOLDER.mkdir();
         ServerLauncher.args = a;
-        File configFile = new File(SERVER_LAUNCHER_FOLDER, "launcher_config.json");
+        File configFile = new File(SERVER_LAUNCHER_FOLDER, "config.json");
+        File pluginConfigFile = new File(SERVER_LAUNCHER_FOLDER, "plugin_config.json");
         if (!configFile.exists()) {
-            File oldConfig = new File("launcher_config.json");
-            if (oldConfig.exists()) {
-                Files.move(oldConfig.toPath(), configFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                System.out.println("[Launcher] Moved old launcher_config.json to folder ServerLauncher");
-            } else {
-                try {
-                    configFile.createNewFile();
-                    PrintStream ps = new PrintStream(configFile);
-                    ps.print(GSON.toJson(new LauncherConfig()));
-                    ps.close();
-                    System.out.println("[Launcher] Created ServerLauncher/launcher_config.json, edit it (if needed) and start again.");
-                    return;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return;
-                }
+            try {
+                configFile.createNewFile();
+                PrintStream ps = new PrintStream(configFile);
+                ps.print(GSON.toJson(new LauncherConfig()));
+                ps.close();
+                System.out.println("[Launcher] Created ServerLauncher/config.json, edit it (if needed) and start again.");
+                return;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
             }
         }
+        System.setProperty("using.serverlauncher", "true");
         config = GSON.fromJson(new String(Files.readAllBytes(configFile.toPath())), LauncherConfig.class);
 
         Launcher launcher = config.getDistro().getLauncher();
-        System.out.println("[Launcher] Downloading latest jar");
-        launcher.download(config);
+        if (launcher != null) {
+            System.out.println("[Launcher] Downloading latest jar");
+            launcher.download(config);
+        } else System.out.println("[Launcher] No Launcher!");
 
-        File pluginConfigFile = new File(SERVER_LAUNCHER_FOLDER, "plugin_config.json");
         if (pluginConfigFile.exists()) {
             JsonArray jsonArray = JsonParser.parseString(new String(Files.readAllBytes(pluginConfigFile.toPath()))).getAsJsonArray();
             System.out.println("[Launcher] Downloading plugins");
@@ -73,9 +73,13 @@ public class ServerLauncher {
             if (downloadOnly) {
                 return;
             }
+        } else {
+            pluginConfigFile.createNewFile();
+            Utilities.writeFile(pluginConfigFile, "[\n]");
+            System.out.println("[Launcher] Created ServerLauncher/plugin_config.json, edit it (if needed) and start again.");
         }
 
-        if (!downloadOnly) {
+        if (!downloadOnly && launcher != null) {
             System.out.println("[Launcher] Launching server");
             launcher.launch(config);
             System.out.println("[Launcher] Detected server shutdown, goodnight!");
