@@ -1,5 +1,6 @@
 package dev.badbird.serverlauncher.config.source;
 
+import dev.badbird.serverlauncher.util.Utilities;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.teamcity.rest.*;
@@ -52,6 +53,8 @@ public class TeamCitySource implements DownloadSource {
         if (build == null) {
             throw new RuntimeException("No build found for teamcity build config " + buildConfig);
         }
+        System.out.println("[TeamCity Downloader] Found build #" + build.getBuildNumber() + " with status " + build.getStatus());
         build.downloadArtifact(artifactName, file);
+        System.out.println("[Downloader] Downloaded " + file.getName() + " from TeamCity, size: " + Utilities.getFileSize(file));
     }
 }

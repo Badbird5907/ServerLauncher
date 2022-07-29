@@ -6,9 +6,9 @@ import java.io.File;
 
 @Getter
 public class PluginConfig {
-    private final String fileName = "PluginName.jar";
+    private String fileName;
 
-    private final DownloadConfig source = new DownloadConfig();
+    private DownloadConfig source = new DownloadConfig();
 
     public void download() {
         File file = new File("plugins", fileName);

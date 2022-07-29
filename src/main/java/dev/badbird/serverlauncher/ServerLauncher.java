@@ -13,6 +13,7 @@ import java.io.PrintStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 public class ServerLauncher {
@@ -27,10 +28,12 @@ public class ServerLauncher {
 
     public static void main(String[] args) throws IOException {
         List<String> a = new ArrayList<>(Arrays.asList(args));
-        for (String s : a) {
-            if (s.equalsIgnoreCase("--download-only")) {
+        Iterator<String> iterator = a.iterator();
+        while (iterator.hasNext()) {
+            String arg = iterator.next();
+            if (arg.equals("--download-only")) {
                 downloadOnly = true;
-                a.remove(s);
+                iterator.remove();
             }
         }
         if (!SERVER_LAUNCHER_FOLDER.exists()) SERVER_LAUNCHER_FOLDER.mkdir();

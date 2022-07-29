@@ -44,4 +44,12 @@ public class Utilities {
             throw new RuntimeException(e);
         }
     }
+
+    public static long getFileSize(File file) {
+        try {
+            return Files.size(file.toPath());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
