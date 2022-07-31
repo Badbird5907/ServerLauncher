@@ -6,8 +6,10 @@ import dev.badbird.serverlauncher.config.LauncherConfig;
 import dev.badbird.serverlauncher.launcher.Launcher;
 import dev.badbird.serverlauncher.util.Utilities;
 import lombok.SneakyThrows;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.jar.JarFile;
 
@@ -19,6 +21,13 @@ public class CustomLauncher implements Launcher {
         if (CONFIG_FILE.exists()) {
             String json = Utilities.readFile(CONFIG_FILE);
             config = ServerLauncher.GSON.fromJson(json, DownloadConfig.class);
+        } else {
+            try {
+                CONFIG_FILE.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            Utilities.writeFile(CONFIG_FILE, ServerLauncher.GSON.toJson(new DownloadConfig()));
         }
     }
 
@@ -26,7 +35,11 @@ public class CustomLauncher implements Launcher {
     public void download(LauncherConfig config) {
         if (this.config != null) {
             System.out.println("[Custom Launcher] Downloading custom server - " + config.getDownloadedFileName());
-            this.config.download(new File(config.getDownloadedFileName()));
+            try {
+                this.config.download(new File(config.getDownloadedFileName()));
+            } catch (RuntimeException e) {
+                System.out.println("[Custom Launcher] Error while downloading custom server - " + e.getLocalizedMessage());
+            }
         }
     }
 
