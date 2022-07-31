@@ -2,6 +2,7 @@ package dev.badbird.serverlauncher.launcher;
 
 import dev.badbird.serverlauncher.ServerLauncher;
 import dev.badbird.serverlauncher.config.LauncherConfig;
+import dev.badbird.serverlauncher.util.JarLoader;
 import lombok.SneakyThrows;
 
 import java.io.File;
@@ -51,12 +52,18 @@ public interface Launcher {
         } else {
             mainClass = jar.getManifest().getMainAttributes().getValue("Main-Class");
         }
-        URLClassLoader classLoader = new URLClassLoader(new URL[]{file.toURI().toURL()}, this.getClass().getClassLoader());
+        URLClassLoader classLoader = null;
+        if (System.setProperty("dev.badbird.serverlauncher.UseNewClassLoader", "false").equalsIgnoreCase("true")) {
+            classLoader = new URLClassLoader(new URL[]{file.toURI().toURL()}, this.getClass().getClassLoader());
+        } else {
+            JarLoader.addToClassPath(file); // We want to load the jar with the system class loader because some servers assume they're running with the system class loader.
+            classLoader = (URLClassLoader) this.getClass().getClassLoader();
+        }
         Class<?> mainClazz;
         try {
             mainClazz = Class.forName(mainClass, true, classLoader);
         } catch (ClassNotFoundException e) {
-            System.err.println("[PaperLauncher] Main class not found in jar, cannot launch.");
+            System.err.println("[Launcher] Main class not found in jar, cannot launch.");
             return;
         }
         Method mainMethod = mainClazz.getMethod("main", String[].class);

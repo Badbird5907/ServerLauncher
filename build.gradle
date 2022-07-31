@@ -40,6 +40,7 @@ test {
 jar {
     manifest {
         attributes "Main-Class": "dev.badbird.serverlauncher.ServerLauncher"
+        attributes "Launcher-Agent-Class": "dev.badbird.serverlauncher.util.JarLoader"
     }
 }
 shadowJar {
