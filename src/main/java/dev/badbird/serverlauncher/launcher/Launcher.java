@@ -52,12 +52,12 @@ public interface Launcher {
         } else {
             mainClass = jar.getManifest().getMainAttributes().getValue("Main-Class");
         }
-        URLClassLoader classLoader = null;
+        ClassLoader classLoader = null;
         if (System.getProperty("dev.badbird.serverlauncher.UseNewClassLoader", "false").equalsIgnoreCase("true")) {
             classLoader = new URLClassLoader(new URL[]{file.toURI().toURL()}, this.getClass().getClassLoader());
         } else {
             JarLoader.addToClassPath(file); // We want to load the jar with the system class loader because some servers assume they're running with the system class loader.
-            classLoader = (URLClassLoader) this.getClass().getClassLoader();
+            classLoader = this.getClass().getClassLoader();
         }
         Class<?> mainClazz;
         try {
