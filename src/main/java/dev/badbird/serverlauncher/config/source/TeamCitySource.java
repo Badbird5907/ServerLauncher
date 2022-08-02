@@ -3,9 +3,11 @@ package dev.badbird.serverlauncher.config.source;
 import dev.badbird.serverlauncher.util.Utilities;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import org.jetbrains.teamcity.rest.*;
 
 import java.io.File;
+import java.io.FileOutputStream;
 
 @Getter
 @Setter
@@ -16,6 +18,7 @@ public class TeamCitySource implements DownloadSource {
 
     private boolean latestSuccess = true;
 
+    @SneakyThrows
     @Override
     public void download(File file) {
         System.out.println("[Downloader] Downloading " + file.getName() + " from TeamCity ");
@@ -51,9 +54,10 @@ public class TeamCitySource implements DownloadSource {
         }
         Build build = locator.latest();
         if (build == null) {
-            throw new RuntimeException("No build found for teamcity build config " + buildConfig);
+            throw new RuntimeException("No build found for teamcity build config " + buildConfig + " (plus any other filters)");
         }
         System.out.println("[TeamCity Downloader] Found build #" + build.getBuildNumber() + " with status " + build.getStatus());
+        System.out.println("[TeamCity Downloader] Downloading artifact " + artifactName + " to " + file.getAbsolutePath());
         build.downloadArtifact(artifactName, file);
         System.out.println("[Downloader] Downloaded " + file.getName() + " from TeamCity, size: " + Utilities.getFileSize(file));
     }

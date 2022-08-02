@@ -36,9 +36,10 @@ public class CustomLauncher implements Launcher {
         if (this.config != null) {
             System.out.println("[Custom Launcher] Downloading custom server - " + config.getDownloadedFileName());
             try {
-                this.config.download(new File(config.getDownloadedFileName()));
+                this.config.download(new File(config.getDownloadedFileName()).getAbsoluteFile());
             } catch (RuntimeException e) {
-                System.out.println("[Custom Launcher] Error while downloading custom server - " + e.getLocalizedMessage());
+                System.out.println("[Custom Launcher] Error while downloading custom server!");
+                throw e;
             }
         }
     }
