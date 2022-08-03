@@ -9,50 +9,38 @@ import lombok.Getter;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 public class ServerLauncher {
+
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    public static final String VERSION = "1.0.1";
     public static final File SERVER_LAUNCHER_FOLDER = new File("ServerLauncher");
-    @Getter
-    private static List<String> args;
+    private static @Getter List<String> args;
     private static boolean downloadOnly = false;
-    @Getter
-    private static LauncherConfig config;
+    private static @Getter LauncherConfig config;
 
     public static void main(String[] args) throws IOException {
-        List<String> a = new ArrayList<>(Arrays.asList(args));
-        Iterator<String> iterator = a.iterator();
-        while (iterator.hasNext()) {
-            String arg = iterator.next();
+        List<String> arrayList = new ArrayList<>(Arrays.asList(args));
+        if (!SERVER_LAUNCHER_FOLDER.exists()) SERVER_LAUNCHER_FOLDER.mkdir();
+        while (arrayList.iterator().hasNext()) {
+            String arg = arrayList.iterator().next();
             if (arg.equals("--download-only")) {
                 downloadOnly = true;
-                iterator.remove();
+                arrayList.iterator().remove();
             }
         }
-        if (!SERVER_LAUNCHER_FOLDER.exists()) SERVER_LAUNCHER_FOLDER.mkdir();
-        ServerLauncher.args = a;
+
+        ServerLauncher.args = arrayList;
         File configFile = new File(SERVER_LAUNCHER_FOLDER, "config.json");
         File pluginConfigFile = new File(SERVER_LAUNCHER_FOLDER, "plugin_config.json");
         if (!configFile.exists()) {
-            try {
-                configFile.createNewFile();
-                PrintStream ps = new PrintStream(configFile);
-                ps.print(GSON.toJson(new LauncherConfig()));
-                ps.close();
-                System.out.println("[Launcher] Created ServerLauncher/config.json, edit it (if needed) and start again.");
-                return;
-            } catch (IOException e) {
-                e.printStackTrace();
-                return;
-            }
+            Utilities.print(configFile, GSON.toJson(new LauncherConfig()));
+            System.out.println("[Launcher] Created ServerLauncher/config.json, edit it (if needed) and start again.");
         }
+
         System.setProperty("using.serverlauncher", "true");
         config = GSON.fromJson(new String(Files.readAllBytes(configFile.toPath())), LauncherConfig.class);
 
@@ -70,13 +58,8 @@ public class ServerLauncher {
                 System.out.println("[Launcher] Downloading plugin " + pluginConfig.getFileName());
                 pluginConfig.download();
             }
-            if (downloadOnly) {
-                return;
-            }
-        } else {
-            pluginConfigFile.createNewFile();
-            Utilities.writeFile(pluginConfigFile, "[\n]");
-            System.out.println("[Launcher] Created ServerLauncher/plugin_config.json, edit it (if needed) and start again.");
+
+            return;
         }
 
         if (!downloadOnly && launcher != null) {
@@ -84,5 +67,9 @@ public class ServerLauncher {
             launcher.launch(config);
             System.out.println("[Launcher] Detected server shutdown, goodnight!");
         }
+
+        pluginConfigFile.createNewFile();
+        Utilities.writeFile(pluginConfigFile, "[\n]");
+        System.out.println("[Launcher] Created ServerLauncher/plugin_config.json, edit it (if needed) and start again.");
     }
 }

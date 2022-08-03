@@ -17,8 +17,8 @@ import java.util.jar.JarFile;
 import java.util.logging.Logger;
 
 public class PaperLauncher implements Launcher {
-    private static final Logger LOGGER = Logger.getLogger("PaperLauncher");
 
+    private static final Logger LOGGER = Logger.getLogger("PaperLauncher");
     private static String jarName = "";
 
     @SneakyThrows
@@ -29,13 +29,16 @@ public class PaperLauncher implements Launcher {
         if (buildVersion.equals("AUTO")) {
             buildNumber = getLatestBuildNumber(config);
         } else buildNumber = Integer.parseInt(buildVersion);
+
         String downloadURL = "https://api.papermc.io/v2/projects/paper/versions/%version%/builds/%build%/downloads/paper-%version%-%build%.jar"
                 .replace("%version%", config.getVersion())
                 .replace("%build%", buildNumber + "");
+
         String downloadTarget = config.getDownloadedFileName()
                 .replace("%server%", "paper")
                 .replace("%version%", config.getVersion())
                 .replace("%build%", buildNumber + "");
+
         System.out.println("[PaperLauncher] Downloading server jar build #" + buildNumber + " version " + config.getVersion());
         System.out.println("[PaperLauncher] Downloading to " + downloadTarget + " from " + downloadURL);
         jarName = downloadTarget;
@@ -51,15 +54,16 @@ public class PaperLauncher implements Launcher {
         StringBuilder sb = new StringBuilder();
         String inputLine;
 
-        while ((inputLine = in.readLine()) != null)
-            sb.append(inputLine).append("\n");
+        while ((inputLine = in.readLine()) != null) sb.append(inputLine).append("\n");
         in.close();
+
         JsonObject json = JsonParser.parseString(sb.toString()).getAsJsonObject();
         int largest = 0;
         for (JsonElement build : json.get("builds").getAsJsonArray()) {
             int i = build.getAsInt();
             if (i > largest) largest = i;
         }
+
         System.out.println("[PaperLauncher] Found latest build for PaperMC " + cfg.getVersion() + " #" + largest);
         return largest;
     }
@@ -71,11 +75,13 @@ public class PaperLauncher implements Launcher {
             System.out.println("[PaperLauncher] jarName not set, cannot launch");
             return;
         }
+
         File jarFile = new File(jarName);
         if (!jarFile.exists()) {
             System.out.println("[PaperLauncher] jarFile not found, cannot launch");
             return;
         }
+
         config.getExtraLaunchProperties().forEach(System::setProperty);
         List<String> args = getLaunchArgs(config);
         JarFile jar = new JarFile(jarFile);

@@ -16,15 +16,14 @@ import java.net.URISyntaxException;
 @Getter
 @Setter
 public class JenkinsSource implements DownloadSource {
+
     private String serverURL;
     private String username;
     private String token;
     private String jobName;
     private String artifactName;
 
-    @Deprecated
-    private String apiToken;
-
+    private @Deprecated String apiToken; // why the hell you depreciating it, then using it.
     private transient JenkinsServer server;
 
     public JenkinsServer getServer() {
@@ -49,17 +48,17 @@ public class JenkinsSource implements DownloadSource {
         JenkinsServer server = getServer();
         System.out.println("[Downloader] Downloading " + file.getName() + " from Jenkins ");
         try {
-            Build build = server.getJob(getJobName())
-                    .getLastSuccessfulBuild();
+            Build build = server.getJob(getJobName()).getLastSuccessfulBuild();
             Artifact artifact = null;
+
             for (Artifact artifact1 : build.details().getArtifacts()) {
                 if (artifact1.getFileName().equalsIgnoreCase(getArtifactName())) {
                     artifact = artifact1;
                 }
             }
+
             if (artifact != null) {
                 InputStream is = build.details().downloadArtifact(artifact);
-                //download the file
                 Utilities.downloadFile(file, is);
             }
         } catch (IOException | URISyntaxException e) {

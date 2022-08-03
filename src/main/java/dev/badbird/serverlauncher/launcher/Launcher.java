@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.jar.JarFile;
 
 public interface Launcher {
-    void download(LauncherConfig config);
 
+    void download(LauncherConfig config);
     void launch(LauncherConfig config);
 
     default List<String> getLaunchArgs(LauncherConfig config) {
@@ -30,8 +30,7 @@ public interface Launcher {
     default void downloadFile(URL url, File target) throws IOException {
         ReadableByteChannel readableByteChannel = Channels.newChannel(url.openStream());
         FileOutputStream fileOutputStream = new FileOutputStream(target);
-        fileOutputStream.getChannel()
-                .transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
+        fileOutputStream.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
     }
 
     default String getFallbackMain() {
@@ -51,14 +50,15 @@ public interface Launcher {
         } else {
             mainClass = jar.getManifest().getMainAttributes().getValue("Main-Class");
         }
+
         URLClassLoader classLoader = new URLClassLoader(new URL[]{file.toURI().toURL()}, this.getClass().getClassLoader());
         Class<?> mainClazz;
-        try {
-            mainClazz = Class.forName(mainClass, true, classLoader);
-        } catch (ClassNotFoundException e) {
+        try { mainClazz = Class.forName(mainClass, true, classLoader); }
+        catch (ClassNotFoundException e) {
             System.err.println("[PaperLauncher] Main class not found in jar, cannot launch.");
             return;
         }
+
         Method mainMethod = mainClazz.getMethod("main", String[].class);
         mainMethod.invoke(null, (Object) args.toArray(new String[0]));
     }

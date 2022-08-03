@@ -17,8 +17,8 @@ import java.util.jar.JarFile;
 import java.util.logging.Logger;
 
 public class MultiPaperLauncher implements Launcher {
-    private static final Logger LOGGER = Logger.getLogger("MultiPaperLauncher");
 
+    private static final Logger LOGGER = Logger.getLogger("MultiPaperLauncher"); // IF YOU ARE GOING TO DECLARE VARIABLES USE THEM!
     private static String jarName = "";
 
     @SneakyThrows
@@ -29,13 +29,16 @@ public class MultiPaperLauncher implements Launcher {
         if (buildVersion.equals("AUTO")) {
             buildNumber = getLatestBuildNumber(config);
         } else buildNumber = Integer.parseInt(buildVersion);
+
         String downloadURL = "https://multipaper.io/api/v2/projects/multipaper/versions/%version%/builds/%build%/downloads/multipaper-%version%-%build%.jar"
                 .replace("%version%", config.getVersion())
                 .replace("%build%", buildNumber + "");
+
         String downloadTarget = config.getDownloadedFileName()
                 .replace("%server%", "multipaper")
                 .replace("%version%", config.getVersion())
                 .replace("%build%", buildNumber + "");
+
         System.out.println("[MultiPaperLauncher] Downloading server jar build #" + buildNumber + " version " + config.getVersion());
         System.out.println("[MultiPaperLauncher] Downloading to " + downloadTarget + " from " + downloadURL);
         jarName = downloadTarget;
@@ -51,15 +54,16 @@ public class MultiPaperLauncher implements Launcher {
         StringBuilder sb = new StringBuilder();
         String inputLine;
 
-        while ((inputLine = in.readLine()) != null)
-            sb.append(inputLine).append("\n");
+        while ((inputLine = in.readLine()) != null) sb.append(inputLine).append("\n");
         in.close();
         JsonObject json = JsonParser.parseString(sb.toString()).getAsJsonObject();
+
         int largest = 0;
         for (JsonElement build : json.get("builds").getAsJsonArray()) {
             int i = build.getAsInt();
             if (i > largest) largest = i;
         }
+
         System.out.println("[MultiPaperLauncher] Found latest build for MultiPaper " + cfg.getVersion() + " #" + largest);
         return largest;
     }
@@ -71,11 +75,13 @@ public class MultiPaperLauncher implements Launcher {
             System.out.println("[MultiPaperLauncher] jarName not set, cannot launch");
             return;
         }
+
         File jarFile = new File(jarName);
         if (!jarFile.exists()) {
             System.out.println("[MultiPaperLauncher] jarFile not found, cannot launch");
             return;
         }
+
         config.getExtraLaunchProperties().forEach(System::setProperty);
         List<String> args = getLaunchArgs(config);
         JarFile jar = new JarFile(jarFile);

@@ -9,7 +9,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class LauncherConfig {
+public class LauncherConfig { // what even is this?
     private ServerDistro distro = ServerDistro.PAPER;
     private String buildNumber = "AUTO";
     private HashMap<String, String> extraLaunchProperties = new HashMap<>();

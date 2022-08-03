@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.jar.JarFile;
 
 public class PurpurLauncher implements Launcher {
+
     private static String jarName = "";
 
     @SneakyThrows
@@ -31,10 +32,12 @@ public class PurpurLauncher implements Launcher {
         } else {
             downloadURL = "https://api.purpurmc.org/v2/purpur/" + config.getVersion() + "/" + buildNumber + "/download/";
         }
+
         String downloadTarget = config.getDownloadedFileName()
                 .replace("%server%", "purpur")
                 .replace("%version%", config.getVersion())
                 .replace("%build%", buildNumber + "");
+
         System.out.println("[PurpurLauncher] Downloading server jar build #" + (buildNumber == -1 ? "LATEST" : buildNumber) + " version " + config.getVersion());
         System.out.println("[PurpurLauncher] Downloading to " + downloadTarget + " from " + downloadURL);
         jarName = downloadTarget;
@@ -49,11 +52,13 @@ public class PurpurLauncher implements Launcher {
             System.out.println("[PurpurLauncher] jarName not set, cannot launch");
             return;
         }
+
         File jarFile = new File(jarName);
         if (!jarFile.exists()) {
             System.out.println("[PurpurLauncher] jarFile not found, cannot launch");
             return;
         }
+
         config.getExtraLaunchProperties().forEach(System::setProperty);
         List<String> args = getLaunchArgs(config);
         JarFile jar = new JarFile(jarFile);

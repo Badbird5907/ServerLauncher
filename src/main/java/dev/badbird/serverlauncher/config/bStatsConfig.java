@@ -11,6 +11,7 @@ import java.nio.file.Files;
 @Getter
 @Setter
 public class bStatsConfig {
+
     private String what_is_bstats = "bStats (https://bStats.org) collects some basic information for plugin authors, like how\n"
             + "many people use their plugin and their total player count. It's recommended to keep bStats\n"
             + "enabled, but if you're not comfortable with this, you can turn this setting off. There is no\n"
@@ -27,7 +28,7 @@ public class bStatsConfig {
         return new File(ServerLauncher.SERVER_LAUNCHER_FOLDER, "serverlauncher_bstats.json");
     }
 
-    public void save() {
+    public void save() { // WHY THE FUCK ARE YOU MAKING METHODS THAT YOU AREN'T USING!?!!!
         File bStatsJson = getFile();
         if (!bStatsJson.exists()) {
             try {
@@ -36,10 +37,10 @@ public class bStatsConfig {
                 e.printStackTrace();
             }
         }
+
         String json = ServerLauncher.GSON.toJson(this);
-        try {
-            Files.write(bStatsJson.toPath(), json.getBytes());
-        } catch (IOException e) {
+        try { Files.write(bStatsJson.toPath(), json.getBytes()); }
+        catch (IOException e) {
             e.printStackTrace();
         }
     }

@@ -11,8 +11,8 @@ import java.io.IOException;
 import java.util.regex.Pattern;
 
 public class GithubReleaseSource implements DownloadSource {
-    private String username, token;
 
+    private String username, token;
     private String repository, release, asset;
 
     @Override
@@ -26,6 +26,7 @@ public class GithubReleaseSource implements DownloadSource {
             } else {
                 github = GitHub.connectAnonymously();
             }
+
             GHRelease rel;
             GHRepository repo = github.getRepository(repository.toLowerCase().replace("https://github.com/", ""));
 
@@ -34,6 +35,7 @@ public class GithubReleaseSource implements DownloadSource {
             } else {
                 rel = repo.getLatestRelease();
             }
+
             Pattern pattern = Pattern.compile(asset);
             for (GHAsset ghAsset : rel.listAssets().toList()) {
                 if (pattern.matcher(ghAsset.getName()).matches() || ghAsset.getName().equalsIgnoreCase(asset)) {

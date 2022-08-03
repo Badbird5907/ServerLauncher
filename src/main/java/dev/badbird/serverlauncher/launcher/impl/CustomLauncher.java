@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.jar.JarFile;
 
 public class CustomLauncher implements Launcher {
+
     private static final File CONFIG_FILE = new File(ServerLauncher.SERVER_LAUNCHER_FOLDER, "custom_launcher.json");
     private DownloadConfig config;
 
@@ -40,8 +41,9 @@ public class CustomLauncher implements Launcher {
             List<String> args = getLaunchArgs(config);
             JarFile jar = new JarFile(file);
             launchJar(jar, file, args);
-        } else {
-            System.out.println("[Custom Launcher] jarFile not found, cannot launch");
+            return;
         }
+
+        System.out.println("[Custom Launcher] jarFile not found, cannot launch");
     }
 }

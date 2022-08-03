@@ -7,25 +7,18 @@ import dev.badbird.serverlauncher.launcher.impl.PaperLauncher;
 import dev.badbird.serverlauncher.launcher.impl.PurpurLauncher;
 
 public enum ServerDistro {
+
     PAPER,
     MULTI_PAPER,
     PURPUR,
-
     CUSTOM;
-    //FABRIC;
 
     public Launcher getLauncher() {
-        switch (this) {
-            case PAPER: {
-                return new PaperLauncher();
-            }
-            case MULTI_PAPER:
-                return new MultiPaperLauncher();
-            case PURPUR:
-                return new PurpurLauncher();
-            case CUSTOM:
-                return new CustomLauncher();
-        }
-        return null;
+        return switch (this) {
+            case PAPER -> new PaperLauncher();
+            case MULTI_PAPER -> new MultiPaperLauncher();
+            case PURPUR -> new PurpurLauncher();
+            case CUSTOM -> new CustomLauncher();
+        };
     }
 }

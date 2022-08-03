@@ -7,7 +7,8 @@ import dev.badbird.serverlauncher.config.source.URLSource;
 
 import java.io.File;
 
-public class DownloadConfig {
+public class DownloadConfig { // declare the variables please
+
     private JenkinsSource jenkins;
     private TeamCitySource teamCity;
     private URLSource url;

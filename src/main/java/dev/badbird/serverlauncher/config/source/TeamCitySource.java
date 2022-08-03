@@ -27,32 +27,38 @@ public class TeamCitySource implements DownloadSource {
         } else {
             instance = TeamCityInstanceFactory.guestAuth(url);
         }
-        BuildLocator locator = instance.builds()
-                .fromConfiguration(new BuildConfigurationId(buildConfig));
+
+        BuildLocator locator = instance.builds().fromConfiguration(new BuildConfigurationId(buildConfig));
         if (tag != null && !tag.isEmpty()) {
             System.out.println(" - With tag " + tag);
             locator = locator.withTag(tag);
         }
+
         if (branch != null && !branch.isEmpty()) {
             System.out.println(" - With branch " + branch);
             locator = locator.withBranch(branch);
         }
+
         if (latestSuccess) {
             System.out.println(" - Using latest successful build");
             locator = locator.withStatus(BuildStatus.SUCCESS);
         }
+
         if (number != null && !number.isEmpty()) {
             System.out.println(" - With build number " + number);
             locator = locator.withNumber(number);
         }
+
         if (revision != null && !revision.isEmpty()) {
             System.out.println(" - With VCS revision " + revision);
             locator = locator.withVcsRevision(revision);
         }
+
         Build build = locator.latest();
         if (build == null) {
             throw new RuntimeException("No build found for teamcity build config " + buildConfig);
         }
+
         System.out.println("[TeamCity Downloader] Found build #" + build.getBuildNumber() + " with status " + build.getStatus());
         build.downloadArtifact(artifactName, file);
         System.out.println("[Downloader] Downloaded " + file.getName() + " from TeamCity, size: " + Utilities.getFileSize(file));
