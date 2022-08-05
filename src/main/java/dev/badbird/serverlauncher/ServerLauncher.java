@@ -82,7 +82,6 @@ public class ServerLauncher {
         if (!downloadOnly && launcher != null) {
             System.out.println("[Launcher] Launching server");
             launcher.launch(config);
-            System.out.println("[Launcher] Detected server shutdown, goodnight!");
         }
     }
 }
