@@ -21,3 +21,11 @@ Default Config:
 ```
 ## WARNING!
 Do not set downloadedFileName to the same name as ServerLauncher jar, it will overwrite itself.
+
+# Plugin Downloader
+Downloads plugins from either a direct URL, github releases, Jenkins or TeamCity.
+
+## Usage
+Open (or create) the file `ServerLauncher/plugin_config.json`.
+Default: `[]`
+Example: [Here](https://github.com/Badbird5907/ServerLauncher/blob/master/plugin_config.example.json)
