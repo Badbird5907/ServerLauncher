@@ -20,4 +20,4 @@ Default Config:
 }
 ```
 ## WARNING!
-Do not set downloadedFileName to the same name as ServerLauncher, it will cause overwrite itself.
+Do not set downloadedFileName to the same name as ServerLauncher, it will overwrite itself.
