@@ -1,6 +1,8 @@
 # ServerLauncher
 A launch wrapper for minecraft servers that automatically keeps them up-to-date. Now with jenkins and teamcity support!
 
+Download: [Here](https://ci.badbird5907.net/job/ServerLauncher/)
+
 # Usage
 Launch this jar as you would launch a normal MC server.
 
