@@ -19,3 +19,5 @@ Default Config:
   "downloadedFileName": "server.jar"
 }
 ```
+## WARNING!
+Do not set downloadedFileName to the same name as ServerLauncher, it will cause overwrite itself.
