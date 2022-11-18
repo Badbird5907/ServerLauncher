@@ -23,7 +23,6 @@ public class LauncherConfig {
     public String replace(String str) {
         if (str.startsWith("%") && str.endsWith("%")) {
             String s = str.substring(1, str.length() - 1);
-            System.out.println("Deserializing: " + str + ", " + s);
             if (s.startsWith("env:"))
                 return System.getenv(s.substring(4));
             else if (s.startsWith("prop:"))
@@ -43,7 +42,6 @@ public class LauncherConfig {
         for (Field field : fields) {
             field.setAccessible(true);
             if (visited.contains(field.get(obj))) continue;
-            System.out.println("Field: " + field.getName());
             Object o = field.get(obj);
             if (o instanceof String) {
                 try {

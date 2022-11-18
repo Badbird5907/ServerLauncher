@@ -42,7 +42,6 @@ public class Utilities {
         connection.setRequestProperty("Authorization", "token " + token);
         connection.setRequestMethod("GET");
         connection.connect();
-        System.out.println("Response code: " + connection.getResponseCode());
         downloadFile(file, connection.getInputStream());
     }
 
