@@ -1,6 +1,8 @@
 package dev.badbird.serverlauncher;
 
+import com.fasterxml.jackson.databind.ser.std.StringSerializer;
 import com.google.gson.*;
+import dev.badbird.serverlauncher.config.DownloadConfig;
 import dev.badbird.serverlauncher.config.LauncherConfig;
 import dev.badbird.serverlauncher.config.PluginConfig;
 import dev.badbird.serverlauncher.launcher.Launcher;
@@ -11,13 +13,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class ServerLauncher {
-    public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     public static final String VERSION = "1.0.1";
     public static final File SERVER_LAUNCHER_FOLDER = new File("ServerLauncher");
     @Getter
@@ -25,6 +23,8 @@ public class ServerLauncher {
     private static boolean downloadOnly = false;
     @Getter
     private static LauncherConfig config;
+
+    public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     public static void main(String[] args) throws IOException {
         List<String> a = new ArrayList<>(Arrays.asList(args));
@@ -55,12 +55,20 @@ public class ServerLauncher {
         }
         System.setProperty("using.serverlauncher", "true");
         config = GSON.fromJson(new String(Files.readAllBytes(configFile.toPath())), LauncherConfig.class);
+        LauncherConfig.replaceFields(config, new ArrayList<>());
 
         Launcher launcher = config.getDistro().getLauncher();
         if (launcher != null) {
             System.out.println("[Launcher] Downloading latest jar");
             launcher.download(config);
         } else System.out.println("[Launcher] No Launcher!");
+
+        if (config.getDownloads() != null && !config.getDownloads().isEmpty()) {
+            System.out.println("[Launcher] Downloading extra files");
+            for (DownloadConfig download : config.getDownloads()) {
+                download.download();
+            }
+        }
 
         if (pluginConfigFile.exists()) {
             JsonArray jsonArray = JsonParser.parseString(new String(Files.readAllBytes(pluginConfigFile.toPath()))).getAsJsonArray();
