@@ -15,10 +15,10 @@ public class GithubFileSource implements DownloadSource {
 
     @Override
     public void download(File file) {
-        
+
         try {
             GitHub github;
-            System.out.println("Downloading from Github, repository: " + repository + ", path: " + path + ", branch: " + branch + ", token: " + token + ", username: " + username);
+            System.out.println("Downloading from Github, repository: " + repository + ", path: " + path + ", branch: " + branch);
             if (token != null && !token.isEmpty() && username != null && !username.isEmpty()) {
                 github = GitHub.connect(username, token);
             } else if (token != null && !token.isEmpty()) {
