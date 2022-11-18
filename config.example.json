@@ -8,5 +8,20 @@
     "nogui"
   ],
   "version": "1.19",
-  "downloadedFileName": "server.jar"
+  "downloadedFileName": "server.jar",
+  "replacements": {
+    "token": "ghp_"
+  },
+  "downloads": [
+    {
+      "fileName": "messages.yml",
+      "githubFile": {
+        "username": "Badbird5907",
+        "token": "%token%",
+        "repository": "Badbird5907/ARepo",
+        "branch": "main",
+        "path": "plugins/SomePlugin/messages.yml"
+      }
+    }
+  ]
 }
