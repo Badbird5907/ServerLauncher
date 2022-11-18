@@ -36,8 +36,15 @@ public class GithubFileSource implements DownloadSource {
     }
     @SneakyThrows
     private void download(GHContent content, String token, File file) {
+        System.out.println("Downloading file from Github: " + content.getDownloadUrl());
         if (content.isDirectory()) {
+            if (System.getProperty("dev.badbird.serverlauncher.dir", "false").equalsIgnoreCase("false")) {
+                System.err.println("Downloading directories from github is currently broken!");
+                System.err.println("Please set the system property 'dev.badbird.serverlauncher.dir' to 'true' to enable this feature.");
+                return;
+            }
             String name = content.getName();
+            System.out.println("File is a directory: " + name);
             File dir = new File(file, name);
             if (!dir.exists()) {
                 dir.mkdirs();
