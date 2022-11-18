@@ -19,7 +19,8 @@ public class DownloadConfig {
         else if (github != null) github.download(file);
         else if (githubFile != null) githubFile.download(file);
         else if (url != null) url.download(file);
-        else throw new RuntimeException("Source is not set!");
+        System.out.println("[Downloader] Source isn't set, cannot download");
+        //else throw new RuntimeException("Source is not set!");
     }
     public void download() {
         download(new File(fileName));
