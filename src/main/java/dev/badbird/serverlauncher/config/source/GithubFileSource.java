@@ -1,6 +1,7 @@
 package dev.badbird.serverlauncher.config.source;
 
 import dev.badbird.serverlauncher.util.Utilities;
+import lombok.SneakyThrows;
 import org.kohsuke.github.GHContent;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
@@ -15,7 +16,6 @@ public class GithubFileSource implements DownloadSource {
 
     @Override
     public void download(File file) {
-
         try {
             GitHub github;
             System.out.println("Downloading from Github, repository: " + repository + ", path: " + path + ", branch: " + branch);
@@ -29,9 +29,24 @@ public class GithubFileSource implements DownloadSource {
             GHRepository repo = github.getRepository(repository.toLowerCase().replace("https://github.com/", ""));
 
             GHContent content = repo.getBranch(branch).getOwner().getFileContent(path, branch);
-            Utilities.downloadFileFromGithub(file, content.getDownloadUrl(), token);
+            download(content, token, file);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+    @SneakyThrows
+    private void download(GHContent content, String token, File file) {
+        if (content.isDirectory()) {
+            String name = content.getName();
+            File dir = new File(file, name);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            for (GHContent ghContent : content.listDirectoryContent()) {
+                download(ghContent, token, new File(file, ghContent.getName()));
+            }
+        } else {
+            Utilities.downloadFileFromGithub(file, content.getDownloadUrl(), token);
         }
     }
 }
