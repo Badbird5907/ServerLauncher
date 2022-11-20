@@ -1,5 +1,6 @@
 package dev.badbird.serverlauncher.config.source;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import dev.badbird.serverlauncher.ServerLauncher;
@@ -25,7 +26,7 @@ public class GithubFileSource implements DownloadSource {
     public void download(File file) {
         try {
             GitHub github;
-            System.out.println("Downloading from Github, repository: " + repository + ", path: " + path + ", branch: " + branch);
+            System.out.println("Downloading from Github, repository: " + repository + ", path: " + path + ", branch: " + branch + ", file: " + file.getAbsolutePath());
             if (token != null && !token.isEmpty() && username != null && !username.isEmpty()) {
                 github = GitHub.connect(username, token);
             } else if (token != null && !token.isEmpty()) {
@@ -41,25 +42,39 @@ public class GithubFileSource implements DownloadSource {
                 System.err.println("[Downloader] Error was thrown by library while downloading from Github, trying to download manually: ");
                 System.err.println(e.getMessage());
                 // Send a request to the API to get the list of files in the directory because the api lib is broken
-                String apiURL = "https://api.github.com/repos/" + repository + "/contents/" + path + "/?ref=" + branch;
-                System.out.println("Downloading directory from Github: " + path);
-                URL url = new URL(apiURL);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestProperty("Authorization", "token " + token);
-                connection.setRequestMethod("GET");
-                connection.connect();
-                String json = Utilities.readStream(connection.getInputStream());
-                JsonObject[] files = ServerLauncher.GSON.fromJson(json, JsonObject[].class);
-                for (JsonObject fileObject : files) {
-                    String name = fileObject.get("name").getAsString();
-                    String downloadURL = fileObject.get("download_url").getAsString();
-                    System.out.println("Downloading file from Github: " + downloadURL);
-                    Utilities.downloadFileFromGithub(new File(file, name), downloadURL, token);
-                }
-
+                dl(file, path);
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    @SneakyThrows
+    public void dl(File file, String path) {
+        String apiURL = "https://api.github.com/repos/" + repository + "/contents/" + path + "/?ref=" + branch;
+        System.out.println("Downloading directory from Github: " + path);
+        URL url = new URL(apiURL);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestProperty("Authorization", "token " + token);
+        connection.setRequestMethod("GET");
+        connection.connect();
+        String json = Utilities.readStream(connection.getInputStream());
+        JsonObject[] files = ServerLauncher.GSON.fromJson(json, JsonObject[].class);
+        for (JsonObject fileObject : files) {
+            System.out.println("Json: " + ServerLauncher.GSON.toJson(fileObject));
+            String name = fileObject.get("name").getAsString();
+            JsonElement element = fileObject.get("download_url");
+            if (element.isJsonNull()) {
+                System.out.println(name + " is a directory, downloading...");
+                String newPath = path + "/" + name;
+                String newFile = file.getAbsolutePath() + "/" + name;
+                dl(new File(newFile), newPath);
+                continue;
+            }
+            String downloadURL = element.getAsString();
+            File f = new File(file, name);
+            System.out.println("Downloading file from Github: " + downloadURL + " to " + f.getAbsolutePath());
+            Utilities.downloadFileFromGithub(f, downloadURL, token);
         }
     }
 
