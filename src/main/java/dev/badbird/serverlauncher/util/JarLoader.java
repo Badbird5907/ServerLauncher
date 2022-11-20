@@ -91,8 +91,8 @@ public class JarLoader {
      * diagnosing client issues.
      *
      * @return returns {@code "none"} if no strategy was found, otherwise a
-     *     short describing the method used; the value {@code "reflection"}
-     *     indicates that a fallback not compatible with Java 9+ is being used
+     * short describing the method used; the value {@code "reflection"}
+     * indicates that a fallback not compatible with Java 9+ is being used
      */
     public static synchronized String getStrategy() {
         String strat = "none";
@@ -120,7 +120,7 @@ public class JarLoader {
      * For this to work the {@code MANIFEST.MF} file <strong>must</strong>
      * include the line {@code Premain-Class: ca.cgjennings.jvm.JarLoader}.
      *
-     * @param agentArgs agent arguments; currently ignored
+     * @param agentArgs       agent arguments; currently ignored
      * @param instrumentation provided by the JRE
      */
     public static void premain(String agentArgs, Instrumentation instrumentation) {
@@ -140,7 +140,7 @@ public class JarLoader {
      * For this to work the {@code MANIFEST.MF} file <strong>must</strong>
      * include the line {@code Agent-Class: ca.cgjennings.jvm.JarLoader}.
      *
-     * @param agentArgs agent arguments; currently ignored
+     * @param agentArgs       agent arguments; currently ignored
      * @param instrumentation provided by the JRE
      */
     public static void agentmain(String agentArgs, Instrumentation instrumentation) {

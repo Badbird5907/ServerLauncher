@@ -1,10 +1,10 @@
 package dev.badbird.serverlauncher;
 
-import com.fasterxml.jackson.databind.ser.std.StringSerializer;
 import com.google.gson.*;
 import dev.badbird.serverlauncher.config.DownloadConfig;
 import dev.badbird.serverlauncher.config.LauncherConfig;
 import dev.badbird.serverlauncher.config.PluginConfig;
+import dev.badbird.serverlauncher.launch.LaunchStep;
 import dev.badbird.serverlauncher.launcher.Launcher;
 import dev.badbird.serverlauncher.util.Utilities;
 import lombok.Getter;
@@ -13,10 +13,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 public class ServerLauncher {
-    public static final String VERSION = "1.0.1";
     public static final File SERVER_LAUNCHER_FOLDER = new File("ServerLauncher");
     @Getter
     private static List<String> args;
@@ -85,6 +87,14 @@ public class ServerLauncher {
             pluginConfigFile.createNewFile();
             Utilities.writeFile(pluginConfigFile, "[\n]");
             System.out.println("[Launcher] Created ServerLauncher/plugin_config.json, edit it (if needed) and start again.");
+        }
+
+        List<LaunchStep> steps = config.getLaunchSteps();
+        if (steps != null && !steps.isEmpty()) {
+            System.out.println("[Launcher] Running launch steps");
+            for (LaunchStep launchStep : steps) {
+                launchStep.run();
+            }
         }
 
         if (!downloadOnly && launcher != null) {

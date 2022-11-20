@@ -1,6 +1,8 @@
 package dev.badbird.serverlauncher.config;
 
+import com.google.gson.JsonObject;
 import dev.badbird.serverlauncher.ServerLauncher;
+import dev.badbird.serverlauncher.launch.LaunchStep;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -19,6 +21,18 @@ public class LauncherConfig {
     private String downloadedFileName = "server.jar";
     private Map<String, String> replacements = new HashMap<>();
     private List<DownloadConfig> downloads = new ArrayList<>();
+    private List<JsonObject> launchSteps = new ArrayList<>();
+
+    public List<LaunchStep> getLaunchSteps() {
+        List<LaunchStep> steps = new ArrayList<>();
+        for (JsonObject object : launchSteps) {
+            LaunchStep.Type type = LaunchStep.Type.valueOf(object.get("type").getAsString().toUpperCase());
+            LaunchStep step = ServerLauncher.GSON.fromJson(object, type.getStep());
+            steps.add(step);
+        }
+        LauncherConfig.replaceFields(steps, new ArrayList<>());
+        return steps;
+    }
 
     public String replace(String str) {
         if (str.startsWith("%") && str.endsWith("%")) {

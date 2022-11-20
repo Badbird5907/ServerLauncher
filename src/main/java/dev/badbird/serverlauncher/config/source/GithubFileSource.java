@@ -34,6 +34,7 @@ public class GithubFileSource implements DownloadSource {
             throw new RuntimeException(e);
         }
     }
+
     @SneakyThrows
     private void download(GHContent content, String token, File file) {
         System.out.println("Downloading file from Github: " + content.getDownloadUrl());

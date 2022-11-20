@@ -10,7 +10,6 @@ public class DownloadConfig {
     private TeamCitySource teamCity;
     private URLSource url;
     private GithubReleaseSource github;
-
     private GithubFileSource githubFile;
 
     public void download(File file) {
@@ -22,6 +21,7 @@ public class DownloadConfig {
         System.out.println("[Downloader] Source isn't set, cannot download");
         //else throw new RuntimeException("Source is not set!");
     }
+
     public void download() {
         download(new File(fileName));
     }

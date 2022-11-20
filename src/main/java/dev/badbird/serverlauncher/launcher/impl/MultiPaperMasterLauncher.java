@@ -54,7 +54,7 @@ public class MultiPaperMasterLauncher implements Launcher {
 
     public int getLatestMasterBuildNumber(LauncherConfig cfg) throws Exception {
         String urlString = "https://multipaper.io/api/v2/projects/multipaper/versions/%version%"
-            .replace("%version%", cfg.getVersion());
+                .replace("%version%", cfg.getVersion());
         URL url = new URL(urlString);
         URLConnection connection = url.openConnection();
         BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -78,8 +78,8 @@ public class MultiPaperMasterLauncher implements Launcher {
 
     public String getLatestMastername(LauncherConfig cfg, int buildnum) throws Exception {
         String urlString = "https://multipaper.io/api/v2/projects/multipaper/versions/%version%/builds/%build%"
-            .replace("%version%", cfg.getVersion())
-            .replace("%build%", buildnum + "");
+                .replace("%version%", cfg.getVersion())
+                .replace("%build%", buildnum + "");
         URL url = new URL(urlString);
         URLConnection connection = url.openConnection();
         BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
