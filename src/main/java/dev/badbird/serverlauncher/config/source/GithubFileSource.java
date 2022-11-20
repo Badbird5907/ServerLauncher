@@ -61,7 +61,7 @@ public class GithubFileSource implements DownloadSource {
         String json = Utilities.readStream(connection.getInputStream());
         JsonObject[] files = ServerLauncher.GSON.fromJson(json, JsonObject[].class);
         for (JsonObject fileObject : files) {
-            System.out.println("Json: " + ServerLauncher.GSON.toJson(fileObject));
+            //System.out.println("Json: " + ServerLauncher.GSON.toJson(fileObject));
             String name = fileObject.get("name").getAsString();
             JsonElement element = fileObject.get("download_url");
             if (element.isJsonNull()) {
