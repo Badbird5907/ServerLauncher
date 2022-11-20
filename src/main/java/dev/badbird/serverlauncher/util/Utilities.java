@@ -68,4 +68,19 @@ public class Utilities {
             throw new RuntimeException(e);
         }
     }
+
+    public static String readStream(InputStream inputStream) {
+        try {
+            StringBuilder sb = new StringBuilder();
+            byte[] buffer = new byte[1024];
+            int len;
+            while ((len = inputStream.read(buffer)) > 0) {
+                sb.append(new String(buffer, 0, len));
+            }
+            inputStream.close();
+            return sb.toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
