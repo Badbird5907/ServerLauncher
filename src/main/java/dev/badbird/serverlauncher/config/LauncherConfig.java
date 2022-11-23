@@ -3,10 +3,13 @@ package dev.badbird.serverlauncher.config;
 import com.google.gson.JsonObject;
 import dev.badbird.serverlauncher.ServerLauncher;
 import dev.badbird.serverlauncher.launch.LaunchStep;
+import dev.badbird.serverlauncher.util.Utilities;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 
+import javax.rmi.CORBA.Util;
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -22,6 +25,7 @@ public class LauncherConfig {
     private Map<String, String> replacements = new HashMap<>();
     private List<DownloadConfig> downloads = new ArrayList<>();
     private List<JsonObject> launchSteps = new ArrayList<>();
+    private boolean replaceStringsAfterDownload = true;
 
     public List<LaunchStep> getLaunchSteps() {
         List<LaunchStep> steps = new ArrayList<>();
@@ -81,5 +85,11 @@ public class LauncherConfig {
                 replaceFields(field.get(obj), visited);
             }
         }
+    }
+
+    public void replaceStringsInFile(File file) {
+        if (replaceStringsAfterDownload && !Utilities.isPlainText(file) || !file.exists()) return;
+        String content = Utilities.readFile(file);
+        Utilities.writeFile(file, replace(content));
     }
 }

@@ -13,11 +13,11 @@ public class DownloadConfig {
     private GithubFileSource githubFile;
 
     public void download(File file) {
-        if (jenkins != null) jenkins.download(file);
-        else if (teamCity != null) teamCity.download(file);
-        else if (github != null) github.download(file);
-        else if (githubFile != null) githubFile.download(file);
-        else if (url != null) url.download(file);
+        if (jenkins != null) jenkins.preDownload(file);
+        else if (teamCity != null) teamCity.preDownload(file);
+        else if (github != null) github.preDownload(file);
+        else if (githubFile != null) githubFile.preDownload(file);
+        else if (url != null) url.preDownload(file);
         System.out.println("[Downloader] Source isn't set, cannot download");
         //else throw new RuntimeException("Source is not set!");
     }

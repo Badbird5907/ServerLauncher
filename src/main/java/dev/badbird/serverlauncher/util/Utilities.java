@@ -69,6 +69,15 @@ public class Utilities {
         }
     }
 
+    public static boolean isPlainText(File file) {
+        try {
+            String type = Files.probeContentType(file.toPath());
+            return type != null && type.startsWith("text");
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
     public static String readStream(InputStream inputStream) {
         try {
             StringBuilder sb = new StringBuilder();
