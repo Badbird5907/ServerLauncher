@@ -58,6 +58,9 @@ public class ServerLauncher {
         System.setProperty("using.serverlauncher", "true");
         config = GSON.fromJson(new String(Files.readAllBytes(configFile.toPath())), LauncherConfig.class);
         LauncherConfig.replaceFields(config, new ArrayList<>());
+        if (config.getWhitelistedFileSuffixes() != null) {
+            Utilities.WHITELISTED_FILE_SUFFIXES.addAll(config.getWhitelistedFileSuffixes());
+        }
 
         Launcher launcher = config.getDistro().getLauncher();
         if (launcher != null) {

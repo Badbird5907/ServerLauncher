@@ -1,5 +1,6 @@
 package dev.badbird.serverlauncher.util;
 
+import dev.badbird.serverlauncher.ServerLauncher;
 import lombok.SneakyThrows;
 
 import java.io.File;
@@ -9,6 +10,9 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Utilities {
     public static void downloadFile(File file, InputStream is) throws IOException {
@@ -24,6 +28,7 @@ public class Utilities {
         fos.close();
         is.close();
         System.out.println("[Downloader] Successfully downloaded file " + file.getName() + " Size: " + Files.size(file.toPath()) + " bytes");
+        ServerLauncher.getConfig().replaceStringsInFile(file);
     }
 
     public static void downloadFile(File file, String url) {
@@ -69,13 +74,14 @@ public class Utilities {
         }
     }
 
-    public static boolean isPlainText(File file) {
-        try {
-            String type = Files.probeContentType(file.toPath());
-            return type != null && type.startsWith("text");
-        } catch (IOException e) {
-            return false;
+    public static final List<String> WHITELISTED_FILE_SUFFIXES = new ArrayList<>(Arrays.asList(".json", ".txt", ".yml", ".properties"));
+
+    public static boolean isWhitelisted(File file) {
+        String name = file.getName();
+        for (String suffix : WHITELISTED_FILE_SUFFIXES) {
+            if (name.endsWith(suffix)) return true;
         }
+        return false;
     }
 
     public static String readStream(InputStream inputStream) {

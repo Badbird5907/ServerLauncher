@@ -8,10 +8,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 
-import javax.rmi.CORBA.Util;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.regex.Pattern;
 
 @Getter
 @Setter
@@ -25,6 +25,7 @@ public class LauncherConfig {
     private Map<String, String> replacements = new HashMap<>();
     private List<DownloadConfig> downloads = new ArrayList<>();
     private List<JsonObject> launchSteps = new ArrayList<>();
+    private List<String> whitelistedFileSuffixes = null;
     private boolean replaceStringsAfterDownload = true;
 
     public List<LaunchStep> getLaunchSteps() {
@@ -47,6 +48,23 @@ public class LauncherConfig {
                 return System.getProperty(s.substring(5));
             else {
                 return replacements.getOrDefault(s, str);
+            }
+        }
+        return str;
+    }
+
+    private static final Pattern PATTERN = Pattern.compile("%.*%");
+    public String replaceInText(String str) {
+        if (str == null) return null;
+        if (PATTERN.matcher(str).find()) {
+            for (Map.Entry<String, String> entry : replacements.entrySet()) {
+                str = str.replace("%" + entry.getKey() + "%", entry.getValue());
+            }
+            for (Map.Entry<String, String> entry : System.getenv().entrySet()) {
+                str = str.replace("%env:" + entry.getKey() + "%", entry.getValue());
+            }
+            for (Map.Entry<Object, Object> entry : System.getProperties().entrySet()) {
+                str = str.replace("%prop:" + entry.getKey() + "%", entry.getValue().toString());
             }
         }
         return str;
@@ -88,8 +106,18 @@ public class LauncherConfig {
     }
 
     public void replaceStringsInFile(File file) {
-        if (replaceStringsAfterDownload && !Utilities.isPlainText(file) || !file.exists()) return;
+        System.out.println("Replacing strings in file: " + file.getName());
+        if (replaceStringsAfterDownload && !Utilities.isWhitelisted(file) || !file.exists()) {
+            System.out.println("File is not a plain text file, or doesn't exist! skipping string replacement.");
+            return;
+        }
         String content = Utilities.readFile(file);
-        Utilities.writeFile(file, replace(content));
+        String replaced = replaceInText(content);
+        Utilities.writeFile(file, replaced);
+        if (content.equals(replaced)) {
+            System.out.println("No strings were replaced in file: " + file.getName());
+            return;
+        }
+        System.out.println("Replaced strings in file: " + file.getName());
     }
 }

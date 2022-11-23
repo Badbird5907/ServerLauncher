@@ -9,6 +9,5 @@ public interface DownloadSource {
 
     default void preDownload(File file) {
         download(file);
-        ServerLauncher.getConfig().replaceStringsInFile(file);
     }
 }
