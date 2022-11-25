@@ -1,5 +1,5 @@
 # ServerLauncher
-A launch wrapper for minecraft servers that automatically keeps them up-to-date. Now with jenkins and teamcity support!
+A launch wrapper for minecraft servers (or any java application, really) that automatically keeps them up-to-date. Now with jenkins and teamcity support!
 
 Download: [Here](https://ci.badbird5907.net/job/ServerLauncher/)
 
