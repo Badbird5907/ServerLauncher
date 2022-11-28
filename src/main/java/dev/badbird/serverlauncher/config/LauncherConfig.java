@@ -92,15 +92,16 @@ public class LauncherConfig {
                     System.err.println("Failed to decode string: " + split[i]);
                 }
             }
-            if (split.length == 1) {
+            if (split.length == 1) { // %hello%
                 str = str.replace(matcher.group(), replacements.getOrDefault(s, matcher.group()));
-            } else if (split.length == 2) {
+            } else if (split.length == 2) { // %env:hello% or %prop:hello% or %hello:def%
                 if (split[0].equals("env")) {
                     str = str.replace(matcher.group(), System.getenv(split[1]));
                 } else if (split[0].equals("prop")) {
                     str = str.replace(matcher.group(), System.getProperty(split[1]));
                 } else {
-                    str = str.replace(matcher.group(), replacements.getOrDefault(s, matcher.group()));
+                    str = str.replace(matcher.group(), replacements.getOrDefault(s, split[1]));
+                    //str = str.replace(matcher.group(), replacements.getOrDefault(s, matcher.group()));
                 }
             } else if (split.length == 3) {
                 if (split[0].equals("env")) {
@@ -123,8 +124,10 @@ public class LauncherConfig {
         dummy.replacements.put("test", "Hi!");
         String s1 = "random text 123 %hello% hello world!";
         String s2 = "eee %prop:test:123% cool";
+        String s3 = "abc %not_existing:default% def";
         System.out.println(dummy.replace(s1));
         System.out.println(dummy.replace(s2));
+        System.out.println(dummy.replace(s3));
     }
 
     @SneakyThrows
