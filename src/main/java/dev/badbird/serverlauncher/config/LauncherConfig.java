@@ -9,8 +9,11 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
+import java.net.URLDecoder;
 import java.util.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Getter
@@ -40,34 +43,88 @@ public class LauncherConfig {
     }
 
     public String replace(String str) {
+        /*
         if (str.startsWith("%") && str.endsWith("%")) {
             String s = str.substring(1, str.length() - 1);
-            if (s.startsWith("env:"))
-                return System.getenv(s.substring(4));
-            else if (s.startsWith("prop:"))
-                return System.getProperty(s.substring(5));
-            else {
+            // to get env or prop, use %env:hello% or %prop:hello%, defaults will also work, so %env:hello:abc% will return abc if hello is not set, and same for prop
+            String[] split = s.split(":");
+            for (int i = 0; i < split.length; i++) {
+                try {
+                    split[i] = URLDecoder.decode(split[i], "UTF-8"); // decode the string, so we can use : in the string (%3A)
+                } catch (UnsupportedEncodingException e) {
+                    System.out.println("Failed to decode string: " + split[i]);
+                }
+            }
+            if (split.length == 1) {
                 return replacements.getOrDefault(s, str);
+            } else if (split.length == 2) {
+                if (split[0].equals("env")) {
+                    return System.getenv(split[1]);
+                } else if (split[0].equals("prop")) {
+                    return System.getProperty(split[1]);
+                } else {
+                    return replacements.getOrDefault(s, str);
+                }
+            } else if (split.length == 3) {
+                if (split[0].equals("env")) {
+                    return System.getenv(split[1]);
+                } else if (split[0].equals("prop")) {
+                    return System.getProperty(split[1]);
+                } else {
+                    return replacements.getOrDefault(s, str);
+                }
+            } else {
+                return str;
+            }
+        }
+        return str;
+         */
+        // We have to replace inside strings, so we need to use regex
+        Pattern pattern = Pattern.compile("%(.*?)%");
+        Matcher matcher = pattern.matcher(str);
+        while (matcher.find()) {
+            String s = matcher.group(1);
+            String[] split = s.split(":");
+            for (int i = 0; i < split.length; i++) {
+                try {
+                    split[i] = URLDecoder.decode(split[i], "UTF-8"); // decode the string, so we can use : in the string (%3A)
+                } catch (UnsupportedEncodingException e) {
+                    System.err.println("Failed to decode string: " + split[i]);
+                }
+            }
+            if (split.length == 1) {
+                str = str.replace(matcher.group(), replacements.getOrDefault(s, matcher.group()));
+            } else if (split.length == 2) {
+                if (split[0].equals("env")) {
+                    str = str.replace(matcher.group(), System.getenv(split[1]));
+                } else if (split[0].equals("prop")) {
+                    str = str.replace(matcher.group(), System.getProperty(split[1]));
+                } else {
+                    str = str.replace(matcher.group(), replacements.getOrDefault(s, matcher.group()));
+                }
+            } else if (split.length == 3) {
+                if (split[0].equals("env")) {
+                    String env = System.getenv(split[1]);
+                    if (env == null) env = split[2];
+                    str = str.replace(matcher.group(), env);
+                } else if (split[0].equals("prop")) {
+                    str = str.replace(matcher.group(), System.getProperty(split[1], split[2]));
+                } else {
+                    str = str.replace(matcher.group(), replacements.getOrDefault(s, matcher.group()));
+                }
             }
         }
         return str;
     }
 
-    private static final Pattern PATTERN = Pattern.compile("%.*%");
-    public String replaceInText(String str) {
-        if (str == null) return null;
-        if (PATTERN.matcher(str).find()) {
-            for (Map.Entry<String, String> entry : replacements.entrySet()) {
-                str = str.replace("%" + entry.getKey() + "%", entry.getValue());
-            }
-            for (Map.Entry<String, String> entry : System.getenv().entrySet()) {
-                str = str.replace("%env:" + entry.getKey() + "%", entry.getValue());
-            }
-            for (Map.Entry<Object, Object> entry : System.getProperties().entrySet()) {
-                str = str.replace("%prop:" + entry.getKey() + "%", entry.getValue().toString());
-            }
-        }
-        return str;
+    public static void main(String[] args) {
+        LauncherConfig dummy = new LauncherConfig();
+        dummy.replacements.put("hello", "world");
+        dummy.replacements.put("test", "Hi!");
+        String s1 = "random text 123 %hello% hello world!";
+        String s2 = "eee %prop:test:123% cool";
+        System.out.println(dummy.replace(s1));
+        System.out.println(dummy.replace(s2));
     }
 
     @SneakyThrows
@@ -112,7 +169,7 @@ public class LauncherConfig {
             return;
         }
         String content = Utilities.readFile(file);
-        String replaced = replaceInText(content);
+        String replaced = replace(content);
         Utilities.writeFile(file, replaced);
         if (content.equals(replaced)) {
             System.out.println("No strings were replaced in file: " + file.getName());
