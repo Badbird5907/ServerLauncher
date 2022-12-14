@@ -92,26 +92,35 @@ public class LauncherConfig {
                     System.err.println("Failed to decode string: " + split[i]);
                 }
             }
+            //System.out.println("Detected replacement string (" + split.length + "): " + s);
             if (split.length == 1) { // %hello%
                 str = str.replace(matcher.group(), replacements.getOrDefault(s, matcher.group()));
+                //System.out.println("Replaced (single)");
             } else if (split.length == 2) { // %env:hello% or %prop:hello% or %hello:def%
                 if (split[0].equals("env")) {
+                    //System.out.println("Replaced (env)2");
                     str = str.replace(matcher.group(), System.getenv(split[1]));
                 } else if (split[0].equals("prop")) {
+                    //System.out.println("Replaced (prop)2");
                     str = str.replace(matcher.group(), System.getProperty(split[1]));
                 } else {
-                    str = str.replace(matcher.group(), replacements.getOrDefault(s, split[1]));
-                    //str = str.replace(matcher.group(), replacements.getOrDefault(s, matcher.group()));
+                    String g = matcher.group();
+                    //System.out.println("g: " + g + " | s: " + s + " | split: " + Arrays.toString(split));
+                    str = str.replace(g, replacements.getOrDefault(split[0], split[1]));
+                    //System.out.println("Replaced (single)2 - " + replacements.getOrDefault(split[0], split[1]) + " | " + split[1]);
                 }
             } else if (split.length == 3) {
                 if (split[0].equals("env")) {
+                    //System.out.println("Replaced (env)3");
                     String env = System.getenv(split[1]);
                     if (env == null) env = split[2];
                     str = str.replace(matcher.group(), env);
                 } else if (split[0].equals("prop")) {
+                    //System.out.println("Replaced (prop)3");
                     str = str.replace(matcher.group(), System.getProperty(split[1], split[2]));
                 } else {
-                    str = str.replace(matcher.group(), replacements.getOrDefault(s, matcher.group()));
+                    //System.out.println("Replaced (single)3");
+                    str = str.replace(matcher.group(), replacements.getOrDefault(s, matcher.group())); // TODO make sure this works too
                 }
             }
         }
@@ -163,7 +172,8 @@ public class LauncherConfig {
                 } else {
                     replaceFields(field.get(obj), visited);
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
     }
 
