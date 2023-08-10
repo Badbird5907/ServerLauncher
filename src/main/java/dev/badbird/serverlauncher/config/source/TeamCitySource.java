@@ -1,24 +1,38 @@
 package dev.badbird.serverlauncher.config.source;
 
+import com.google.common.reflect.TypeToken;
 import dev.badbird.serverlauncher.ServerLauncher;
 import dev.badbird.serverlauncher.util.Utilities;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.SneakyThrows;
+import lombok.*;
 import org.jetbrains.teamcity.rest.*;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.lang.reflect.Type;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Getter
 @Setter
+@EqualsAndHashCode
 public class TeamCitySource implements DownloadSource {
     private String url, username, password, token;
 
     private String buildConfig = "", artifactName = "", tag, branch, number, revision;
 
     private boolean latestSuccess = true;
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    public static class LastBuildInfo {
+        private TeamCitySource source;
+        private String buildNumber;
+    }
+
+    private static final Type LAST_BUILD_INFO_LIST = new TypeToken<ArrayList<LastBuildInfo>>(){}.getType();
 
     @SneakyThrows
     @Override
@@ -59,13 +73,20 @@ public class TeamCitySource implements DownloadSource {
             throw new RuntimeException("No build found for teamcity build config " + buildConfig + " (plus any other filters)");
         }
         boolean useCache = System.getProperty("dev.badbird.serverlauncher.teamcity.UseCache", "true").equalsIgnoreCase("true");
-        if (useCache) {
-            File cacheFile = new File(ServerLauncher.CACHE_FOLDER, "_teamcity_last_build");
+        List<LastBuildInfo> lastBuildInfos = null;
+        if (useCache) { // TODO fix this crap below cause this is for all teamcity builds
+            File cacheFile = new File(ServerLauncher.CACHE_FOLDER, "_teamcity_last_build_.json");
             if (cacheFile.exists()) {
-                String lastBuild = new String(Files.readAllBytes(cacheFile.toPath()));
-                if (lastBuild.trim().equalsIgnoreCase(build.getBuildNumber())) {
-                    System.out.println("[TeamCity Downloader] Build #" + build.getBuildNumber() + " is the same as the last build, skipping download");
-                    return;
+                String lastBuildData = new String(Files.readAllBytes(cacheFile.toPath()));
+                lastBuildInfos = ServerLauncher.GSON.fromJson(lastBuildData, LAST_BUILD_INFO_LIST);
+                if (lastBuildInfos != null && !lastBuildInfos.isEmpty()) {
+                    LastBuildInfo lastBuildInfo = lastBuildInfos.stream().filter(info -> info.getSource().equals(this)).findFirst().orElse(null);
+                    if (lastBuildInfo != null) {
+                        if (Objects.equals(lastBuildInfo.getBuildNumber(), build.getBuildNumber())) {
+                            System.out.println("[TeamCity Downloader] Build #" + build.getBuildNumber() + " is the same as the last build, skipping download");
+                            return;
+                        }
+                    }
                 }
             }
         }
@@ -74,11 +95,13 @@ public class TeamCitySource implements DownloadSource {
         build.downloadArtifact(artifactName, file);
         System.out.println("[Downloader] Downloaded " + file.getName() + " from TeamCity, size: " + Utilities.getFormattedFileSize(file));
         if (useCache) {
-            File cacheFile = new File(ServerLauncher.CACHE_FOLDER, "_teamcity_last_build");
-            if (!cacheFile.exists())
-                cacheFile.createNewFile();
+            File cacheFile = new File(ServerLauncher.CACHE_FOLDER, "_teamcity_last_build_.json");
+            if (!cacheFile.exists()) cacheFile.createNewFile();
+            if (lastBuildInfos == null) lastBuildInfos = new ArrayList<>();
+            lastBuildInfos.removeIf(info -> info.getSource().equals(this));
+            lastBuildInfos.add(new LastBuildInfo(this, build.getBuildNumber()));
             FileOutputStream stream = new FileOutputStream(cacheFile);
-            stream.write(build.getBuildNumber().getBytes());
+            stream.write(ServerLauncher.GSON.toJson(lastBuildInfos).getBytes());
             stream.flush();
             stream.close();
         }
