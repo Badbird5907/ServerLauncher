@@ -33,7 +33,7 @@ public class CustomLauncher implements Launcher {
     @Override
     public void download(LauncherConfig config) {
         if (this.config != null) {
-            System.out.println("[Custom Launcher] Downloading custom server - " + config.getDownloadedFileName());
+            System.out.println("[Custom Launcher] Downloading custom server - " + this.config.getFileName());
             try {
                 this.config.download(new File(config.getDownloadedFileName()).getAbsoluteFile());
             } catch (RuntimeException e) {

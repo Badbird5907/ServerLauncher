@@ -19,7 +19,8 @@ import java.util.Iterator;
 import java.util.List;
 
 public class ServerLauncher {
-    public static final File SERVER_LAUNCHER_FOLDER = new File(System.getProperty("dev.badbird.serverlauncher.folder", "ServerLauncher"));
+    public static final File SERVER_LAUNCHER_FOLDER = new File(System.getProperty("dev.badbird.serverlauncher.folder", "ServerLauncher")),
+     CACHE_FOLDER = new File(SERVER_LAUNCHER_FOLDER, ".cache");
     @Getter
     private static List<String> args;
     private static boolean downloadOnly = false;
@@ -39,6 +40,7 @@ public class ServerLauncher {
             }
         }
         if (!SERVER_LAUNCHER_FOLDER.exists()) SERVER_LAUNCHER_FOLDER.mkdir();
+        if (!CACHE_FOLDER.exists()) CACHE_FOLDER.mkdir();
         ServerLauncher.args = a;
         File configFile = new File(SERVER_LAUNCHER_FOLDER, "config.json");
         File pluginConfigFile = new File(SERVER_LAUNCHER_FOLDER, "plugin_config.json");

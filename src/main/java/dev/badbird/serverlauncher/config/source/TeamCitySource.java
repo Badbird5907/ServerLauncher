@@ -60,7 +60,7 @@ public class TeamCitySource implements DownloadSource {
         }
         boolean useCache = System.getProperty("dev.badbird.serverlauncher.teamcity.UseCache", "true").equalsIgnoreCase("true");
         if (useCache) {
-            File cacheFile = new File(new File(ServerLauncher.SERVER_LAUNCHER_FOLDER, ".cache"), "_teamcity_last_build");
+            File cacheFile = new File(ServerLauncher.CACHE_FOLDER, "_teamcity_last_build");
             if (cacheFile.exists()) {
                 String lastBuild = new String(Files.readAllBytes(cacheFile.toPath()));
                 if (lastBuild.trim().equalsIgnoreCase(build.getBuildNumber())) {
@@ -74,7 +74,7 @@ public class TeamCitySource implements DownloadSource {
         build.downloadArtifact(artifactName, file);
         System.out.println("[Downloader] Downloaded " + file.getName() + " from TeamCity, size: " + Utilities.getFormattedFileSize(file));
         if (useCache) {
-            File cacheFile = new File(new File(ServerLauncher.SERVER_LAUNCHER_FOLDER, ".cache"), "_teamcity_last_build");
+            File cacheFile = new File(ServerLauncher.CACHE_FOLDER, "_teamcity_last_build");
             if (!cacheFile.exists())
                 cacheFile.createNewFile();
             FileOutputStream stream = new FileOutputStream(cacheFile);

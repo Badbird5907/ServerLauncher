@@ -1,10 +1,12 @@
 package dev.badbird.serverlauncher.config;
 
 import dev.badbird.serverlauncher.config.source.*;
+import lombok.Getter;
 
 import java.io.File;
 
 public class DownloadConfig {
+    @Getter
     private String fileName;
     private JenkinsSource jenkins;
     private TeamCitySource teamCity;
