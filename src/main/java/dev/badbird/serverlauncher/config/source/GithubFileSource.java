@@ -51,8 +51,9 @@ public class GithubFileSource implements DownloadSource {
 
     @SneakyThrows
     public void dl(File file, String path) {
-        String apiURL = "https://api.github.com/repos/" + repository + "/contents/" + path + "/?ref=" + branch;
-        System.out.println("Downloading directory from Github: " + path);
+        String apiURL = "https://api.github.com/repos/" + repository + "/contents/" + path + "?ref=" + branch;
+        System.out.println("Downloading directory from Github: " + path + ", branch: " + branch + ", file: " + file.getAbsolutePath());
+        System.out.println("API URL: " + apiURL);
         URL url = new URL(apiURL);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestProperty("Authorization", "token " + token);
