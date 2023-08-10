@@ -74,6 +74,19 @@ public class Utilities {
         }
     }
 
+    public static String getFormattedFileSize(File file) {
+        long size = getFileSize(file);
+        if (size > 1024 * 1024 * 1024) {
+            return String.format("%.2f GB", size / (1024.0 * 1024.0 * 1024.0));
+        } else if (size > 1024 * 1024) {
+            return String.format("%.2f MB", size / (1024.0 * 1024.0));
+        } else if (size > 1024) {
+            return String.format("%.2f KB", size / 1024.0);
+        } else {
+            return size + " bytes";
+        }
+    }
+
     public static final List<String> WHITELISTED_FILE_SUFFIXES = new ArrayList<>(Arrays.asList(".json", ".txt", ".yml", ".properties"));
 
     public static boolean isWhitelisted(File file) {

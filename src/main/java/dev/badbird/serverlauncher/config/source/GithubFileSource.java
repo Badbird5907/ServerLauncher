@@ -2,12 +2,10 @@ package dev.badbird.serverlauncher.config.source;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import dev.badbird.serverlauncher.ServerLauncher;
 import dev.badbird.serverlauncher.util.Utilities;
 import dev.badbird.serverlauncher.util.github.GithubFile;
 import lombok.SneakyThrows;
-import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHContent;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;

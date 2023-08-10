@@ -6,7 +6,6 @@ import dev.badbird.serverlauncher.config.LauncherConfig;
 import dev.badbird.serverlauncher.launcher.Launcher;
 import dev.badbird.serverlauncher.util.Utilities;
 import lombok.SneakyThrows;
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;

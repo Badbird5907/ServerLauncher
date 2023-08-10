@@ -23,7 +23,8 @@ public class DownloadConfig {
     }
 
     public void download() {
-        if (fileName.isEmpty()) throw new RuntimeException("File name is not set! If you want to download a directory from github, set it to '.', or the directory name");
+        if (fileName.isEmpty())
+            throw new RuntimeException("File name is not set! If you want to download a directory from github, set it to '.', or the directory name");
         download(new File(fileName));
     }
 }

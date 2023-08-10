@@ -1,7 +1,5 @@
 package dev.badbird.serverlauncher.config.source;
 
-import dev.badbird.serverlauncher.ServerLauncher;
-
 import java.io.File;
 
 public interface DownloadSource {

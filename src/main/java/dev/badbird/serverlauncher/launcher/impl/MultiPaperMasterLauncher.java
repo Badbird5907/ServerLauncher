@@ -6,8 +6,6 @@ import com.google.gson.JsonParser;
 import dev.badbird.serverlauncher.config.LauncherConfig;
 import dev.badbird.serverlauncher.launcher.Launcher;
 import lombok.SneakyThrows;
-import net.sf.json.JSON;
-import net.sf.json.JSONArray;
 
 import java.io.BufferedReader;
 import java.io.File;

@@ -72,7 +72,7 @@ public class TeamCitySource implements DownloadSource {
         System.out.println("[TeamCity Downloader] Found build #" + build.getBuildNumber() + " with status " + build.getStatus());
         System.out.println("[TeamCity Downloader] Downloading artifact " + artifactName + " to " + file.getAbsolutePath());
         build.downloadArtifact(artifactName, file);
-        System.out.println("[Downloader] Downloaded " + file.getName() + " from TeamCity, size: " + Utilities.getFileSize(file));
+        System.out.println("[Downloader] Downloaded " + file.getName() + " from TeamCity, size: " + Utilities.getFormattedFileSize(file));
         if (useCache) {
             File cacheFile = new File(new File(ServerLauncher.SERVER_LAUNCHER_FOLDER, ".cache"), "_teamcity_last_build");
             if (!cacheFile.exists())
