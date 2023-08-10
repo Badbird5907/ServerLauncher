@@ -1,5 +1,6 @@
 package dev.badbird.serverlauncher.config.source;
 
+import dev.badbird.serverlauncher.ServerLauncher;
 import dev.badbird.serverlauncher.util.Utilities;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,6 +9,7 @@ import org.jetbrains.teamcity.rest.*;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.nio.file.Files;
 
 @Getter
 @Setter
@@ -56,9 +58,29 @@ public class TeamCitySource implements DownloadSource {
         if (build == null) {
             throw new RuntimeException("No build found for teamcity build config " + buildConfig + " (plus any other filters)");
         }
+        boolean useCache = System.getProperty("dev.badbird.serverlauncher.teamcity.UseCache", "true").equalsIgnoreCase("true");
+        if (useCache) {
+            File cacheFile = new File(new File(ServerLauncher.SERVER_LAUNCHER_FOLDER, ".cache"), "_teamcity_last_build");
+            if (cacheFile.exists()) {
+                String lastBuild = new String(Files.readAllBytes(cacheFile.toPath()));
+                if (lastBuild.trim().equalsIgnoreCase(build.getBuildNumber())) {
+                    System.out.println("[TeamCity Downloader] Build #" + build.getBuildNumber() + " is the same as the last build, skipping download");
+                    return;
+                }
+            }
+        }
         System.out.println("[TeamCity Downloader] Found build #" + build.getBuildNumber() + " with status " + build.getStatus());
         System.out.println("[TeamCity Downloader] Downloading artifact " + artifactName + " to " + file.getAbsolutePath());
         build.downloadArtifact(artifactName, file);
         System.out.println("[Downloader] Downloaded " + file.getName() + " from TeamCity, size: " + Utilities.getFileSize(file));
+        if (useCache) {
+            File cacheFile = new File(new File(ServerLauncher.SERVER_LAUNCHER_FOLDER, ".cache"), "_teamcity_last_build");
+            if (!cacheFile.exists())
+                cacheFile.createNewFile();
+            FileOutputStream stream = new FileOutputStream(cacheFile);
+            stream.write(build.getBuildNumber().getBytes());
+            stream.flush();
+            stream.close();
+        }
     }
 }

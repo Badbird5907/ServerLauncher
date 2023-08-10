@@ -19,7 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class ServerLauncher {
-    public static final File SERVER_LAUNCHER_FOLDER = new File("ServerLauncher");
+    public static final File SERVER_LAUNCHER_FOLDER = new File(System.getProperty("dev.badbird.serverlauncher.folder", "ServerLauncher"));
     @Getter
     private static List<String> args;
     private static boolean downloadOnly = false;

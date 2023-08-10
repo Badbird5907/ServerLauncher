@@ -76,31 +76,37 @@ public class LauncherConfig {
         Field[] fields = obj.getClass().getDeclaredFields();
         visited.add(obj);
         for (Field field : fields) {
-            field.setAccessible(true);
-            if (visited.contains(field.get(obj))) continue;
-            Object o = field.get(obj);
-            if (o instanceof String) {
-                try {
-                    String str = (String) field.get(obj);
-                    if (str != null) {
-                        field.set(obj, ServerLauncher.getConfig().replace(str));
+            try {
+                {
+                    field.setAccessible(true);
+                    if (visited.contains(field.get(obj))) continue;
+                    Object o = field.get(obj);
+                    if (o instanceof String) {
+                        try {
+                            String str = (String) field.get(obj);
+                            if (str != null) {
+                                field.set(obj, ServerLauncher.getConfig().replace(str));
+                            }
+                        } catch (IllegalAccessException e) {
+                            e.printStackTrace();
+                        }
+                    } else if (o instanceof Collection<?>) {
+                        Collection<?> collection = (Collection<?>) o;
+                        for (Object o1 : collection) {
+                            replaceFields(o1, visited);
+                        }
+                    } else if (o instanceof Map<?, ?>) {
+                        Map<?, ?> map = (Map<?, ?>) o;
+                        for (Object o1 : map.keySet()) {
+                            replaceFields(o1, visited);
+                            replaceFields(map.get(o1), visited);
+                        }
+                    } else {
+                        replaceFields(field.get(obj), visited);
                     }
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
                 }
-            } else if (o instanceof Collection<?>) {
-                Collection<?> collection = (Collection<?>) o;
-                for (Object o1 : collection) {
-                    replaceFields(o1, visited);
-                }
-            } else if (o instanceof Map<?, ?>) {
-                Map<?, ?> map = (Map<?, ?>) o;
-                for (Object o1 : map.keySet()) {
-                    replaceFields(o1, visited);
-                    replaceFields(map.get(o1), visited);
-                }
-            } else {
-                replaceFields(field.get(obj), visited);
+            } catch (Exception e) {
+                continue;
             }
         }
     }
